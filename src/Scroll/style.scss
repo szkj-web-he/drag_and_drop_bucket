@@ -1,0 +1,60 @@
+.scroll_scrollContainer {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.scroll_scrollBar__vertical {
+    background-color: #d5d5d5;
+    border-radius: 1.5px;
+    width: 3px;
+    position: absolute;
+    cursor: pointer;
+    transition: width 0.1s ease, border-radius 0.2s ease, height 0.1s ease;
+    right: 0;
+    top: 0;
+    z-index: 50;
+    &:hover {
+        width: 7px;
+        border-radius: 3.5px;
+    }
+}
+
+.scroll_scrollBar__horizontal {
+    background-color: #d5d5d5;
+    border-radius: 1.5px;
+    height: 3px;
+    position: absolute;
+    cursor: pointer;
+    transition: height 0.1s ease, border-radius 0.2s ease, width 0.1s ease;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    &:hover {
+        height: 7px;
+        border-radius: 3.5px;
+    }
+}
+
+.scroll_scrollBarContainer {
+    position: absolute;
+    z-index: -1;
+    overflow: auto;
+    width: 5rem;
+    height: 5rem;
+    pointer-events: none;
+}
+
+.scroll_scrollBody {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

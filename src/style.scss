@@ -1,0 +1,181 @@
+@use './normalize.scss' as *;
+
+$fontFamily: alibaba-puhuiti, sans-serif;
+
+$color: #212121;
+
+html,
+.wrapper,
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.h1 {
+    font-family: $fontFamily;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 30px;
+    letter-spacing: 0.2px;
+    color: $color;
+    .des {
+        font-weight: 400;
+        color: #757575;
+    }
+}
+
+.warehouse_wrap {
+    margin-top: 32px;
+}
+
+.warehouse_total {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    font-family: $fontFamily;
+    letter-spacing: 0.2px;
+    color: #bdbdbd;
+}
+
+.warehouse_totalVal {
+    color: #22a6b3;
+    margin: 0 5px;
+}
+
+.warehouse_items {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-flow: row wrap;
+    margin-top: 8px;
+    padding-bottom: 24px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ebebeb;
+    max-height: 178px;
+    overflow: auto;
+    > .item {
+        margin-right: 20px;
+        margin-bottom: 16px;
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+}
+
+.item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ebebeb;
+    color: #4d4d4d;
+    font-family: $fontFamily;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 21px;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    &.gray {
+        background-color: #ebebeb;
+        color: transparent;
+    }
+}
+
+.floating {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ebebeb;
+    color: #4d4d4d;
+    font-family: $fontFamily;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 21px;
+    background-color: #fff;
+    letter-spacing: 0.2px;
+    position: absolute;
+    z-index: 50;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.storageCabinet_row {
+    background: #f9fbfb;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-flow: row nowrap;
+    box-sizing: border-box;
+}
+
+.storageCabinet_total {
+    color: #bdbdbd;
+    font-family: $fontFamily;
+    letter-spacing: 0.2px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    span {
+        padding: 0 5px;
+
+        color: #22a6b3;
+    }
+}
+
+.storageCabinet_item {
+    width: 166px;
+    height: 180px;
+    background-color: #fff;
+    box-shadow: 0px 2px 8px rgba(26, 26, 26, 0.08), 0px 2px 4px rgba(26, 26, 26, 0.03);
+    border-radius: 6px;
+    padding-top: 8px;
+    padding-bottom: 12px;
+    box-sizing: border-box;
+}
+
+.storageCabinet_itemTitle {
+    color: #bdbdbd;
+    letter-spacing: 0.2px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 21px;
+    font-family: $fontFamily;
+    margin-bottom: 16px;
+    padding-left: 12px;
+    box-sizing: border-box;
+}
+
+.mobileScroll {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+.storageCabinet_itemValues {
+    width: 100%;
+    height: calc(100% - 21px - 16px);
+    .item {
+        margin-right: 16px;
+        margin-bottom: 12px;
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+}
+
+.scroll_scrollBody {
+    padding: 0 12px;
+}
+
+.scroll_scrollBar__vertical {
+    right: 4px;
+}
