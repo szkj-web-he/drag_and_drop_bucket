@@ -7,8 +7,11 @@ let instanceData = {};
 let preData = {};
 
 export function updateStateListener(data) {
-    instanceData = Object.assign({}, { ...instanceData }, JSON.parse(JSON.stringify(data)));
-    postState(instanceData);
+    const cData = Object.assign({}, { ...instanceData }, JSON.parse(JSON.stringify(data)));
+    if (JSON.stringify(cData) !== JSON.stringify(instanceData)) {
+        instanceData = { ...cData };
+        postState(instanceData);
+    }
 }
 
 export function removeState(data) {

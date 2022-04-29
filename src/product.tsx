@@ -1,11 +1,11 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import { createPortal } from 'react-dom';
-import React, { useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { stopSelect } from './noSelected';
 import { useMContext } from './context';
 import { getScrollValue } from './getScrollValue';
-import { isMobile } from './isMobile';
+
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -20,7 +20,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const { mouseUpOnStorage } = useMContext();
+    const { mouseUpOnStorage, isMobile, position, setPosition } = useMContext();
 
     const selectedFn = useRef<typeof document.onselectstart>(null);
 
@@ -31,17 +31,26 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         y: 0,
     });
 
-    const [style, setStyle] = useState<React.CSSProperties>();
+    // const [style, setStyle] = useState<React.CSSProperties>();
+
+    const valRef = useRef(value);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
+
+    useLayoutEffect(() => {
+        valRef.current = value;
+    }, [value]);
+
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
     // 当移动时
-    const handleMove = (e: MouseEvent | TouchEvent) => {
+    const handleMove = (e: MouseEvent | React.TouchEvent<HTMLDivElement>) => {
+        if (!valRef.current) return;
+
         let x = 0;
         let y = 0;
         if (e instanceof MouseEvent) {
@@ -60,10 +69,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         point.current.pageX = x;
         point.current.pageY = y;
 
-        setStyle({
-            left: `${point.current.x}px`,
-            top: `${point.current.y}px`,
-        });
+        setPosition({ ...point.current });
     };
 
     // 当鼠标 或者手 弹起时的通用事件
@@ -75,7 +81,8 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
             pageX: 0,
             pageY: 0,
         };
-        setStyle(undefined);
+
+        setPosition(undefined);
         handleChange(undefined);
     };
 
@@ -87,17 +94,37 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     };
 
     // 当手离开屏幕时
-    const handleTouchEnd = (e: TouchEvent) => {
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        if (!valRef.current) return;
+
         const position = e.changedTouches[0];
 
         const x = position.pageX;
         const y = position.pageY;
         const els = document.elementsFromPoint(x, y);
-        console.log(els);
+
+        for (let i = 0; i < els.length; ) {
+            const el = els[i];
+
+            if (el.nodeName !== 'HTML' && el.nodeName !== 'BODY') {
+                const className = el.getAttribute('class');
+                if (className?.split(' ').includes('storageCabinet_item')) {
+                    const n = el.getAttribute('data-i');
+                    if (n) {
+                        mouseUpOnStorage.current = {
+                            storageCabinet: { index: Number(n), val: valRef.current },
+                        };
+                    }
+                    i = els.length;
+                } else if (className?.includes('warehouse_items')) {
+                    mouseUpOnStorage.current = { warehouse: valRef.current };
+                    i = els.length;
+                }
+            }
+            ++i;
+        }
 
         handleUp();
-        document.removeEventListener('touchmove', handleMove);
-        document.removeEventListener('touchend', handleTouchEnd);
     };
 
     // 手或者鼠标 按下的通用事件
@@ -123,12 +150,11 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
             x: rectX,
             y: rectY,
         };
-        setStyle({
-            left: `${point.current.x}px`,
-            top: `${point.current.y}px`,
+        setPosition({
+            ...point.current,
         });
 
-        mouseUpOnStorage.current = false;
+        mouseUpOnStorage.current = undefined;
     };
 
     // 当鼠标按下时
@@ -148,9 +174,6 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
             x: position.pageX,
             y: position.pageY,
         });
-
-        document.addEventListener('touchmove', handleMove);
-        document.addEventListener('touchend', handleTouchEnd);
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
@@ -161,11 +184,13 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
                     <div
                         className={`item${value === item ? ' gray' : ''}`}
                         key={item}
-                        {...(isMobile()
+                        {...(isMobile
                             ? {
                                   onTouchStart: (e) => {
                                       handleTouchStart(item, e);
                                   },
+                                  onTouchMove: handleMove,
+                                  onTouchEnd: handleTouchEnd,
                               }
                             : {
                                   onMouseDown: (e) => {
@@ -178,9 +203,15 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
                 );
             })}
 
-            {!!style &&
+            {!!position &&
                 createPortal(
-                    <div className="floating" style={style}>
+                    <div
+                        className="floating"
+                        style={{
+                            left: `${position.x}px`,
+                            top: `${position.y}px`,
+                        }}
+                    >
                         {value}
                     </div>,
                     document.body,

@@ -1,10 +1,9 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useMContext } from './context';
-import { isMobile } from './isMobile';
-import { Product } from './product';
-import { ScrollComponent } from './Scroll';
+import React from 'react';
+import { useMContext } from '../context';
+import { Product } from '../product';
+import { ScrollComponent } from '../Scroll';
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -26,36 +25,22 @@ export const Item: React.FC<ItemProps> = ({
 }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [mobileStatus, setMobileStatus] = useState(isMobile);
-
-    const valRef = useRef(value);
-
-    const { mouseUpOnStorage } = useMContext();
+    const { mouseUpOnStorage, isMobile } = useMContext();
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
-    useEffect(() => {
-        const fn = () => {
-            setMobileStatus(isMobile);
-        };
-        window.addEventListener('resize', fn);
-        return () => {
-            window.removeEventListener('resize', fn);
-        };
-    }, []);
 
-    useLayoutEffect(() => {
-        valRef.current = value;
-    }, [value]);
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
     const onChange = (res: string | undefined) => {
-        if (valRef.current && !res) {
-            const n = values.findIndex((item) => item === valRef.current);
-            const data = mouseUpOnStorage.current;
+        const data = mouseUpOnStorage.current;
+        if (data && !res) {
+            const val = 'warehouse' in data ? data.warehouse : data.storageCabinet.val;
 
-            if (n >= 0 && data && (data === 'warehouse' || data.storageCabinet !== index)) {
+            const n = values.findIndex((item) => item === val);
+
+            if (n >= 0 && ('warehouse' in data || data.storageCabinet.index !== index)) {
                 const arr = [...values];
                 arr.splice(n, 1);
                 handleValuesChange([...arr]);
@@ -65,7 +50,7 @@ export const Item: React.FC<ItemProps> = ({
     };
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
-    return mobileStatus ? (
+    return isMobile ? (
         <div className="mobileScroll">
             <Product list={values} handleChange={onChange} value={value} />
         </div>

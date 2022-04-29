@@ -1,4 +1,4 @@
-export const defaultItems = [
+export const fruits = [
     '苹果',
     '李子',
     '橙子',
@@ -15,4 +15,15 @@ export const defaultItems = [
     '马奶葡萄',
 ];
 
-export const defaultTypes = ['红色', '黄色', '绿色', '白色', '橙色', '紫色'];
+export const colors = [
+    '红色',
+    '黄色',
+    '绿色',
+    '白色',
+    '橙色',
+    '紫色',
+    '粉色',
+    '棕色',
+    '黑色',
+    '蓝色',
+];

@@ -10,7 +10,17 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+}
+
+html,
+body {
     overflow: hidden;
+}
+
+.wrapper {
+    overflow: auto;
 }
 
 .h1 {
@@ -47,6 +57,7 @@ body {
 }
 
 .warehouse_items {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -58,6 +69,7 @@ body {
     border-bottom: 1px solid #ebebeb;
     max-height: 178px;
     overflow: auto;
+    min-height: 100px;
     > .item {
         margin-right: 20px;
         margin-bottom: 16px;
@@ -105,11 +117,12 @@ body {
 .storageCabinet_row {
     background: #f9fbfb;
     border-radius: 10px;
-    padding: 20px;
+    padding: 0px 8px 20px 8px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-flow: row wrap;
     box-sizing: border-box;
 }
 
@@ -138,6 +151,15 @@ body {
     padding-top: 8px;
     padding-bottom: 12px;
     box-sizing: border-box;
+    margin: 20px 12px 0 12px;
+    flex: 0 0 auto;
+    border: 1px solid #fff;
+    transition: all 0.2s linear;
+    &.active {
+        border-color: #22a6b3;
+        border-style: dashed;
+        background-color: #e9f7f8;
+    }
 }
 
 .storageCabinet_itemTitle {
@@ -178,4 +200,51 @@ body {
 
 .scroll_scrollBar__vertical {
     right: 4px;
+}
+
+.warehouse_placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bdbdbd;
+    font-family: $fontFamily;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    line-height: 21px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.storageCabinet_wrap {
+    &.mobile {
+        .storageCabinet_item {
+            width: 205px;
+            height: 180px;
+        }
+    }
+    &.small_desk {
+        .storageCabinet_row {
+            flex-flow: row nowrap;
+            overflow: scroll;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            box-sizing: border-box;
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+        .storageCabinet_item {
+            width: 141px;
+            height: 180px;
+        }
+    }
+    // &.375 {
+    // }
+    // &.1024 {
+    // }
 }

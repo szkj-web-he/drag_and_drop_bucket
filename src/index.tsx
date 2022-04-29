@@ -3,9 +3,10 @@ import './style.scss';
 
 import { listenToParentIPC, render } from './boilerplate';
 import { Warehouse } from './warehouse';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StorageCabinet } from './storageCabinet';
 import { Context } from './context';
+import { isMobile } from './isMobile';
 
 listenToParentIPC();
 
@@ -13,10 +14,31 @@ const Main = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     const [selectItem, setSelectItem] = useState<string>();
-    const status = useRef<false | 'warehouse' | { storageCabinet: number }>(false);
+
+    const status = useRef<
+        { warehouse: string } | { storageCabinet: { index: number; val: string } }
+    >();
+
+    const [mobileStatus, setMobileStatus] = useState(isMobile);
+
+    const [position, setPosition] = useState<{
+        x: number;
+        y: number;
+    }>();
+
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
+
+    useEffect(() => {
+        const fn = () => {
+            setMobileStatus(isMobile);
+        };
+        window.addEventListener('resize', fn);
+        return () => {
+            window.removeEventListener('resize', fn);
+        };
+    }, []);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
@@ -26,13 +48,12 @@ const Main = () => {
         <Context.Provider
             value={{
                 mouseUpOnStorage: status,
+                isMobile: mobileStatus,
+                position,
+                setPosition,
             }}
         >
             <div className="wrapper">
-                <div className="h1">
-                    Copy Q1. 请对以下水果进行分类。
-                    <span className="des">（一个框可放一个或多个，至少放一个）</span>
-                </div>
                 <Warehouse handleChange={(res) => setSelectItem(res)} value={selectItem} />
                 <StorageCabinet handleChange={(res) => setSelectItem(res)} value={selectItem} />
             </div>

@@ -1,9 +1,9 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useEffect, useRef, useState } from 'react';
-import { updateStateListener } from './boilerplate';
-import { useMContext } from './context';
-import { Item } from './ColorFruits/item';
+import { updateStateListener } from '../boilerplate';
+import { useMContext } from '../context';
+import { Item } from './item';
 // import { defaultTypes } from './unit';
 import { ConfigYML } from '@possie-engine/dr-plugin-sdk/config/yml';
 import { PluginComms } from '@possie-engine/dr-plugin-sdk/pluginComms';
@@ -14,7 +14,7 @@ const comms = new PluginComms({ defaultConfig: new ConfigYML() });
 
 // !等下放开
 // const colors: string[] = comms.getConfigNode('colors');
-import { colors } from './defaultData';
+import { colors } from '../defaultData';
 export interface StorageCabinetProps {
     handleChange: (res: string | undefined) => void;
     value?: string;
@@ -129,7 +129,6 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
         return () => {
             window.clearTimeout(timer);
         };
-        // }
     }, [position]);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
@@ -157,20 +156,10 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
     };
 
     let classStr = 'storageCabinet_wrap';
-    let arrowEl = <></>;
-
     if (isMobile) {
-        classStr += is375 ? ' small_mobile' : ' mobile';
+        classStr += is375 ? ' 375' : ' mobile';
     } else {
-        if (is1024) {
-            classStr += ' small_desk';
-            arrowEl = (
-                <div className="arrowContainer">
-                    <div className="arrowContainer_pre"></div>
-                    <div className="arrowContainer_next"></div>
-                </div>
-            );
-        }
+        classStr += is1024 ? ' 1024' : '';
     }
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
