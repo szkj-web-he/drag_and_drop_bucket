@@ -69,7 +69,6 @@ export const removeClass = (el: HTMLElement, c: string) => {
 
 export const getMatrixAttr = (el: HTMLElement) => {
     const attr = window.getComputedStyle(el, null).transform;
-    console.log({ attr });
 
     if (attr.includes('matrix')) {
         const attrArr = attr.replace(/(matrix|[()])/g, '').split(',');

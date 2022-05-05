@@ -186,8 +186,9 @@ body {
     width: 100%;
     height: calc(100% - 21px - 16px);
     .item {
-        margin-right: 16px;
-        margin-bottom: 12px;
+        // margin-right: 16px;
+        margin: 0 8px 12px 8px;
+        // margin-bottom: 12px;
         &:last-of-type {
             margin-right: 0;
         }
@@ -195,7 +196,7 @@ body {
 }
 
 .scroll_scrollBody {
-    padding: 0 12px;
+    padding: 0 6px;
 }
 
 .scroll_scrollBar__vertical {
