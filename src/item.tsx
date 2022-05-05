@@ -1,9 +1,9 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React from 'react';
-import { useMContext } from '../context';
-import { Product } from '../product';
-import { ScrollComponent } from '../Scroll';
+import { useMContext } from './context';
+import { Product } from './product';
+import { ScrollComponent } from './Scroll';
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */

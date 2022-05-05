@@ -1,9 +1,8 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './style.scss';
 import { setScrollBar } from './Unit/setScrollBar';
-import { EventParams, addEventList, removeEventList } from './Unit/eventListener';
 import { stopSelect } from './Unit/noSelected';
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
@@ -84,7 +83,6 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             className,
             style,
             onMouseOver,
-            onMouseOut,
             stopPropagation = true,
             isSmooth,
             bodyClassName,
@@ -100,36 +98,17 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
 
         const smoothRef = useRef(isSmooth);
 
-        const hoverTimer = useRef<number | null>(null);
-
         const point = useRef(0);
 
         const selectedFn = useRef<typeof document.onselectstart>(null);
 
+        const [focus, setFocus] = useState(false);
+
+        const [hover, setHover] = useState(false);
+
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
         /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
         /************* This section will include this component parameter *************/
-        useEffect(() => {
-            const node = scrollEl.current;
-            if (node) {
-                setScrollBar(node);
-            }
-        }, [
-            hidden,
-            children,
-            width,
-            height,
-            handleBarChange,
-            defaultScrollTop,
-            defaultScrollLeft,
-            className,
-            style,
-            onMouseOver,
-            onMouseOut,
-            stopPropagation,
-            isSmooth,
-            props,
-        ]);
 
         useLayoutEffect(() => {
             smoothRef.current = isSmooth;
@@ -163,33 +142,16 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             }
         }, [defaultScrollLeft]);
 
-        useEffect(
-            () => () => {
-                hoverTimer.current && window.clearTimeout(hoverTimer.current);
-            },
-            [],
-        );
+        useEffect(() => {
+            const node = scrollEl.current;
+            if (!node) {
+                return;
+            }
 
-        useLayoutEffect(() => {
-            const event: EventParams[] = [
-                {
-                    type: 'resize',
-                    listener: () => {
-                        setScrollBar(scrollEl.current);
-                    },
-                },
-                {
-                    type: 'load',
-                    listener: () => {
-                        setScrollBar(scrollEl.current);
-                    },
-                },
-            ];
-            addEventList(window, event);
-            return () => {
-                removeEventList(window, event);
-            };
-        }, []);
+            if (focus || hover) {
+                setScrollBar(node);
+            }
+        }, [focus, hover]);
 
         /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
@@ -222,6 +184,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             point.current = 0;
             document.onselectstart = selectedFn.current;
             selectedFn.current = null;
+            setFocus(false);
             document.removeEventListener('mousemove', handleVerticalMove);
             document.removeEventListener('mouseup', handleVerticalUp);
         };
@@ -250,6 +213,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             point.current = 0;
             document.onselectstart = selectedFn.current;
             selectedFn.current = null;
+            setFocus(false);
             document.removeEventListener('mousemove', handleHorizontalMove);
             document.removeEventListener('mouseup', handleHorizontalUp);
         };
@@ -262,7 +226,6 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             const node = scrollEl.current;
             setScrollBar(node);
             const el = e.currentTarget;
-            // console.log({ scroll: el.scrollLeft }, "scroll");
             handleBarChange &&
                 handleBarChange({
                     left: el.scrollLeft,
@@ -281,16 +244,8 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          * 1. 重新计算滚动条尺寸
          */
         const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
-            hoverTimer.current && window.clearTimeout(hoverTimer.current);
-
-            const fn = () => {
-                if (scrollEl.current) {
-                    setScrollBar(scrollEl.current);
-                }
-            };
-
-            hoverTimer.current = window.setTimeout(fn, 17);
-
+            setScrollBar(e.currentTarget);
+            setHover(true);
             onMouseOver && onMouseOver(e);
         };
 
@@ -298,7 +253,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          * 当鼠标 离开 滚动容器上时
          */
         const handleMouseLeave = () => {
-            hoverTimer.current && window.clearTimeout(hoverTimer.current);
+            setHover(false);
         };
 
         /**
@@ -309,7 +264,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             stopSelect(e, selectedFn, stopPropagation);
 
             point.current = e.pageY;
-
+            setFocus(true);
             document.addEventListener('mousemove', handleVerticalMove);
             document.addEventListener('mouseup', handleVerticalUp);
         };
@@ -320,7 +275,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          */
         const handleMouseDownOnHorizontalBar = (e: React.MouseEvent<HTMLDivElement>) => {
             stopSelect(e, selectedFn, stopPropagation);
-
+            setFocus(true);
             point.current = e.pageX;
             document.addEventListener('mousemove', handleHorizontalMove);
             document.addEventListener('mouseup', handleHorizontalUp);
@@ -335,11 +290,8 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
                 <></>
             ) : (
                 <div
-                    className="scroll_scrollBar__vertical"
+                    className={`scroll_scrollBar__vertical${hover || focus ? ' active' : ''}`}
                     onMouseDown={handleMouseDownOnVerticalBar}
-                    ref={() => {
-                        setScrollBar(scrollEl.current);
-                    }}
                     onClick={(e) => stopPropagation && e.stopPropagation()}
                 />
             );
@@ -352,10 +304,7 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
                 <></>
             ) : (
                 <div
-                    className="scroll_scrollBar__horizontal"
-                    ref={() => {
-                        setScrollBar(scrollEl.current);
-                    }}
+                    className={`scroll_scrollBar__horizontal${hover || focus ? ' active' : ''}`}
                     onMouseDown={handleMouseDownOnHorizontalBar}
                     onClick={(e) => stopPropagation && e.stopPropagation()}
                 />
@@ -372,7 +321,6 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             <div
                 className={containerClassName.join(' ')}
                 onMouseOver={handleMouseOver}
-                onMouseOut={onMouseOut}
                 onMouseLeave={handleMouseLeave}
                 ref={ref}
                 style={Object.assign({}, width ? { width } : {}, height ? { height } : {})}
