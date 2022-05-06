@@ -16,6 +16,7 @@ import { colors } from './defaultData';
 import { Desk } from './ColorItems/desk';
 import { SmallDesk } from './ColorItems/smallDesk';
 import { Tablet } from './ColorItems/tablet';
+import { Mobile } from './ColorItems/mobile';
 export interface StorageCabinetProps {
     handleChange: (res: string | undefined) => void;
     value?: string;
@@ -71,7 +72,12 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
 
     if (isMobile) {
         mainEl = is375 ? (
-            <></>
+            <Mobile
+                value={value}
+                handleChange={handleChange}
+                handleColorChange={handleColorChange}
+                colors={colors}
+            />
         ) : (
             <Tablet
                 value={value}
@@ -99,7 +105,7 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
     }
 
     if (isMobile) {
-        classStr += is375 ? ' small_mobile' : ' mobile';
+        classStr += is375 ? ' mobile' : ' tablet';
     } else if (is1024) {
         classStr += ' small_desk';
     }

@@ -57,9 +57,28 @@ const Main = () => {
                 <Warehouse handleChange={(res) => setSelectItem(res)} value={selectItem} />
                 <StorageCabinet handleChange={(res) => setSelectItem(res)} value={selectItem} />
             </div>
+
+            {!!position &&
+                createPortal(
+                    <div
+                        className="floating"
+                        style={{
+                            left: `${position.x}px`,
+                            top: `${position.y}px`,
+                        }}
+                    >
+                        {selectItem}
+                    </div>,
+                    document.body,
+                )}
         </Context.Provider>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */
 
+import VConsole from 'vconsole';
+import { createPortal } from 'react-dom';
+
+// or init with options
+new VConsole({ theme: 'dark' });
 render(<Main />);

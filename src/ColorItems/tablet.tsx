@@ -35,25 +35,23 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
     });
 
     const timeOut = useRef<number | null>(null);
-    /**
-     * status
-     * 1 => 向右
-     * -1 => 向左
-     * null =>未声明
-     */
+
+    const tracks = useRef<Array<number>>();
+
     const touchData = useRef<{
         val: number;
         x: number;
-
-        start: number;
+        y: number | null;
         startTime: number;
         status: null | 1 | -1;
+        startX: number;
     }>({
         val: 0,
         x: 0,
-        start: 0,
+        y: null,
         startTime: 0,
         status: null,
+        startX: 0,
     });
 
     /**
@@ -108,78 +106,112 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
         const el = ref.current;
         if (!el) return;
 
-        const x = e.changedTouches[0].pageX;
-
-        const attr = getMatrixAttr(el);
-        const val = Number(attr?.translateX) || 0;
-        if (transitionData.current.active) {
-            el.style.transform = `translateX(${val}px)`;
-        }
+        const touchVal = e.changedTouches[0];
 
         touchData.current = {
-            x,
-            start: x,
-            val,
+            val: 0,
+            x: touchVal.pageX,
+            y: touchVal.pageY,
             startTime: Date.now(),
-            status: 1,
+            status: null,
+            startX: touchVal.pageX,
         };
 
+        tracks.current = undefined;
         timeOut.current && window.clearTimeout(timeOut.current);
-        removeClass(el, 'transition');
 
         document.addEventListener('touchmove', handleTouchMove);
         document.addEventListener('touchend', handleTouchEnd);
         document.addEventListener('touchcancel', handleTouchCancel);
     };
+
+    /**
+     * 还原数据
+     */
+    const rest = () => {
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+        document.removeEventListener('touchcancel', handleTouchCancel);
+
+        touchData.current = {
+            val: 0,
+            x: 0,
+            y: null,
+            startTime: 0,
+            status: null,
+            startX: 0,
+        };
+
+        tracks.current = undefined;
+    };
+    /**
+     * 同意 执行手势
+     */
+    const executionGestures = () => {
+        const el = ref.current;
+        if (!el) return;
+
+        const total = Math.ceil(listRef.current.length / 6) - 1;
+        let value = currentPage;
+        if (touchData.current.status === 1) {
+            value -= 1;
+        } else {
+            value += 1;
+        }
+        if (value < 0) {
+            value = 0;
+        } else if (value > total) {
+            value = total;
+        }
+        el.style.transform = `translateX(${(value ? -value : value) * el.offsetWidth}px)`;
+        setCurrentPage(value);
+        addClassName('transition');
+    };
     /**
      * 触摸结束后
      */
     const handleTouchEnd = (e: TouchEvent) => {
-        // var momentumTimeThreshold = 300; // 触发惯性滚动的最大时长，ms
-        // var momentumYThreshold = 15; // 触发惯性滚动的最小位移距离，ms
         const el = ref.current;
         if (!el) return;
-        const totalDistance = e.changedTouches[0].pageX - touchData.current.start;
-        const totalTime = Date.now() - touchData.current.startTime;
 
-        const v = Math.abs(totalDistance) / totalTime;
-        console.log({
-            totalDistance,
-            totalTime,
-            速度: Math.abs(totalDistance) / totalTime,
-        });
+        if (Math.abs(e.changedTouches[0].pageX - touchData.current.startX) > el.offsetWidth / 3) {
+            executionGestures();
+        } else {
+            const arr = tracks.current?.slice(tracks.current.length - 3, tracks.current.length);
+            const v = (arr?.reduce((a, b) => a + b) || 0) / (arr?.length || 0);
 
-        let value = currentPage;
-        if (v > 0.8) {
-            const total = Math.ceil(listRef.current.length / 6) - 1;
-
-            if (touchData.current.status === 1) {
-                console.log('向左移动');
-                value -= 1;
-            } else if (touchData.current.status === -1) {
-                console.log('向右移动');
-                value += 1;
-            }
-            console.log({ value, currentPage });
-
-            if (value < 0) {
-                value = 0;
-            } else if (value > total) {
-                value = total;
+            if (Math.abs(v) > 0.5 && v !== 0) {
+                executionGestures();
+            } else {
+                el.style.transform = `translateX(${
+                    (currentPage ? -currentPage : currentPage) * el.offsetWidth
+                }px)`;
+                addClassName('transition');
             }
         }
-        console.log({ value });
 
-        el.style.transform = `translateX(${(value ? -value : value) * el.offsetWidth}px)`;
-        setCurrentPage(value);
-        addClassName('transition');
-
-        document.removeEventListener('touchend', handleTouchEnd);
-        document.removeEventListener('touchcancel', handleTouchCancel);
-
-        touchData.current.status = null;
-        console.log(' ');
+        rest();
     };
+
+    /**
+     * 轨迹测速
+     */
+    const setTracks = (x: number) => {
+        const nowTime = Date.now();
+
+        const d = x - touchData.current.x;
+        const s = nowTime - touchData.current.startTime;
+        const v = d / s;
+
+        touchData.current.startTime = nowTime;
+        if (!v) return;
+        if (tracks.current) {
+            tracks.current.push(v);
+        } else {
+            tracks.current = [v];
+        }
+    };
+
     /**
      * 触摸移动中
      */
@@ -187,21 +219,45 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
         const el = ref.current;
         if (!el) return;
 
-        const x = e.changedTouches[0].pageX;
+        const touchVal = e.changedTouches[0];
+        const x = touchVal.pageX;
+        const y = touchVal.pageY;
 
-        if (x >= touchData.current.x) {
-            if (touchData.current.status !== 1) {
-                touchData.current.status = 1;
-                touchData.current.startTime = Date.now();
-                touchData.current.start = x;
-            }
-        } else if (touchData.current.status !== -1) {
-            touchData.current.status = -1;
-            touchData.current.startTime = Date.now();
-            touchData.current.start = x;
+        if (
+            typeof touchData.current.y === 'number' &&
+            Math.abs(y - touchData.current.y) > Math.abs(x - touchData.current.x)
+        ) {
+            handleTouchCancel();
+
+            return;
         }
 
+        /**
+         * 第一次 执行Move
+         */
+        if (touchData.current.status === null) {
+            const attr = getMatrixAttr(el);
+            const val = Number(attr?.translateX) || 0;
+            touchData.current.val = val;
+            removeClass(el, 'transition');
+        }
+
+        touchData.current.y = null;
+
         const moveVal = x - touchData.current.x;
+
+        if (moveVal > 0) {
+            if (touchData.current.status === -1) {
+                tracks.current = undefined;
+            }
+            touchData.current.status = 1;
+        } else if (moveVal < 0) {
+            if (touchData.current.status === 1) {
+                tracks.current = undefined;
+            }
+            touchData.current.status = -1;
+        }
+        setTracks(x);
 
         touchData.current.x = x;
 
@@ -214,9 +270,12 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
         } else if (val < -total * el.offsetWidth) {
             val = -total * el.offsetWidth;
         }
+
         touchData.current.val = val;
+
         el.style.transform = `translateX(${val}px)`;
     };
+
     /**
      * 触摸取消
      */
@@ -226,9 +285,7 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
 
         el.style.transform = `translateX(-${currentPage * el.offsetWidth}px);`;
         addClassName('transition');
-        document.removeEventListener('touchmove', handleTouchMove);
-        document.removeEventListener('touchend', handleTouchEnd);
-        document.removeEventListener('touchcancel', handleTouchCancel);
+        rest();
     };
     /**
      * 赋值过渡动画的class name

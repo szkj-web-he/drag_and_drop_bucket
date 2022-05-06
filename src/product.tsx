@@ -1,6 +1,5 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import { createPortal } from 'react-dom';
 import React, { useLayoutEffect, useRef } from 'react';
 import { stopSelect } from './noSelected';
 import { useMContext } from './context';
@@ -20,7 +19,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const { mouseUpOnStorage, isMobile, position, setPosition } = useMContext();
+    const { mouseUpOnStorage, isMobile, setPosition } = useMContext();
 
     const selectedFn = useRef<typeof document.onselectstart>(null);
 
@@ -30,8 +29,6 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         x: 0,
         y: 0,
     });
-
-    // const [style, setStyle] = useState<React.CSSProperties>();
 
     const valRef = useRef(value);
 
@@ -50,7 +47,6 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     // 当移动时
     const handleMove = (e: MouseEvent | React.TouchEvent<HTMLDivElement>) => {
         if (!valRef.current) return;
-
         let x = 0;
         let y = 0;
         if (e instanceof MouseEvent) {
@@ -170,6 +166,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     //当手触摸时
     const handleTouchStart = (item: string, e: React.TouchEvent<HTMLDivElement>) => {
         const position = e.changedTouches[0];
+        e.stopPropagation();
         handleDown(item, e, {
             x: position.pageX,
             y: position.pageY,
@@ -202,20 +199,6 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
                     </div>
                 );
             })}
-
-            {!!position &&
-                createPortal(
-                    <div
-                        className="floating"
-                        style={{
-                            left: `${position.x}px`,
-                            top: `${position.y}px`,
-                        }}
-                    >
-                        {value}
-                    </div>,
-                    document.body,
-                )}
         </>
     );
 };

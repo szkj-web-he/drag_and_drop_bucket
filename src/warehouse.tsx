@@ -88,7 +88,11 @@ export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => 
     return (
         <div className="warehouse_wrap">
             <div className="warehouse_total">
-                共<span className="warehouse_totalVal">{list.length}</span>项
+                共
+                <span className={`warehouse_totalVal${list.length ? '' : ' red'}`}>
+                    {list.length}
+                </span>
+                项
             </div>
             <div className="warehouse_items" onMouseUp={handleMouseUp}>
                 <div
