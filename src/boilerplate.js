@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import ReactDOM from "react-dom";
 
 const instanceConfig = {};
 
@@ -7,7 +7,12 @@ let instanceData = {};
 let preData = {};
 
 export function updateStateListener(data) {
-    const cData = Object.assign({}, { ...instanceData }, JSON.parse(JSON.stringify(data)));
+    const cData = Object.assign(
+        {},
+        { ...instanceData },
+        JSON.parse(JSON.stringify(data))
+    );
+
     if (JSON.stringify(cData) !== JSON.stringify(instanceData)) {
         instanceData = { ...cData };
         postState(instanceData);
@@ -28,12 +33,12 @@ function postState() {
         instanceId: instanceConfig.instanceId,
         state: instanceData,
     };
-    window.parent.postMessage({ ...data }, '*');
+    window.parent.postMessage({ ...data }, "*");
     preData = { ...data };
 }
 
 export function listenToParentIPC() {
-    window.addEventListener('message', (e) => {
+    window.addEventListener("message", (e) => {
         instanceConfig.instanceId = e.data.instanceId;
         if (
             JSON.stringify(preData) !==
@@ -48,7 +53,7 @@ export function listenToParentIPC() {
 }
 
 export function render(elem) {
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
         ReactDOM.render(elem, document.body);
     });
 }

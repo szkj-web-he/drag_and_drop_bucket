@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { useMContext } from '../context';
-import { Item } from '../item';
-import { ScrollComponent } from '../Scroll';
-import { Icon } from '../icon';
-import { DeskProps } from './desk';
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useMContext } from "../context";
+import { Item } from "../item";
+import { ScrollComponent } from "../Scroll";
+import { Icon } from "../icon";
+import { DeskProps } from "./desk";
 
 export const SmallDesk: React.FC<DeskProps> = ({
     colors,
@@ -11,23 +11,9 @@ export const SmallDesk: React.FC<DeskProps> = ({
     value,
     handleColorChange,
 }) => {
-    const listRef = useRef<
-        Array<{
-            name: string;
-            values: string[];
-        }>
-    >(
-        colors.map((item) => {
-            return {
-                name: item,
-                values: [],
-            };
-        }),
-    );
+    const listRef = useRef([...colors]);
 
     const { mouseUpOnStorage, position } = useMContext();
-
-    const [list, setList] = useState([...listRef.current]);
 
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -39,9 +25,9 @@ export const SmallDesk: React.FC<DeskProps> = ({
      */
     const [scrollStatus, setScrollStatus] = useState<0 | 1 | 2>(0);
 
-    useEffect(() => {
-        console.log({ scrollStatus });
-    }, [scrollStatus]);
+    useLayoutEffect(() => {
+        listRef.current = [...colors];
+    }, [colors]);
 
     const getScrollEl = () => {
         const el = scrollEl.current;
@@ -51,9 +37,9 @@ export const SmallDesk: React.FC<DeskProps> = ({
             const item = el.children[i];
             if (
                 item
-                    .getAttribute('class')
-                    ?.split(' ')
-                    .some((val) => val === 'scroll_scrollBody')
+                    .getAttribute("class")
+                    ?.split(" ")
+                    .some((val) => val === "scroll_scrollBody")
             ) {
                 i = el.children.length;
 
@@ -71,7 +57,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
         if (!node) return;
         node.scrollTo({
             left: node.scrollLeft - 165,
-            behavior: 'smooth',
+            behavior: "smooth",
         });
     };
     const toRight = () => {
@@ -80,7 +66,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
         if (!node) return;
         node.scrollTo({
             left: node.scrollLeft + 164,
-            behavior: 'smooth',
+            behavior: "smooth",
         });
     };
 
@@ -91,21 +77,23 @@ export const SmallDesk: React.FC<DeskProps> = ({
 
             const childList = el.children;
 
-            const els = position ? document.elementsFromPoint(position.x, position.y) : [];
+            const els = position
+                ? document.elementsFromPoint(position.x, position.y)
+                : [];
 
             for (let i = 0; i < childList.length; i++) {
                 const child = childList[i];
                 const status = els.some((item) => item === child);
-                const classList = child.getAttribute('class')?.split(' ') || [];
-                const n = classList?.findIndex((item) => item === 'active');
+                const classList = child.getAttribute("class")?.split(" ") || [];
+                const n = classList?.findIndex((item) => item === "active");
                 if (status) {
                     if (n === undefined || n < 0) {
-                        classList.push('active');
-                        child.setAttribute('class', classList.join(' '));
+                        classList.push("active");
+                        child.setAttribute("class", classList.join(" "));
                     }
-                } else if (typeof n === 'number' && n > 0) {
+                } else if (typeof n === "number" && n > 0) {
                     classList.splice(n, 1);
-                    child.setAttribute('class', classList.join(' '));
+                    child.setAttribute("class", classList.join(" "));
                 }
             }
         };
@@ -116,12 +104,10 @@ export const SmallDesk: React.FC<DeskProps> = ({
         };
     }, [position]);
 
-    useEffect(() => {
-        handleColorChange(list);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [list]);
-
-    const handleMouseUp = ({ values }: { name: string; values: string[] }, n: number) => {
+    const handleMouseUp = (
+        { values }: { name: string; values: string[] },
+        n: number
+    ) => {
         if (!value) return;
         const status = values.some((val) => val === value);
         if (!status) {
@@ -130,11 +116,8 @@ export const SmallDesk: React.FC<DeskProps> = ({
 
         const arr = [...listRef.current];
         arr[n].values = [...values];
-
-        if (JSON.stringify(listRef.current) !== JSON.stringify(arr)) {
-            listRef.current = [...arr];
-            setList([...listRef.current]);
-        }
+        listRef.current = [...arr];
+        handleColorChange([...listRef.current]);
 
         mouseUpOnStorage.current = {
             storageCabinet: {
@@ -171,13 +154,17 @@ export const SmallDesk: React.FC<DeskProps> = ({
         <>
             <div className="arrowContainer">
                 <div
-                    className={`arrowContainer_pre${scrollStatus === 0 ? ' gray' : ''}`}
+                    className={`arrowContainer_pre${
+                        scrollStatus === 0 ? " gray" : ""
+                    }`}
                     onClick={toLeft}
                 >
                     <Icon className="arrowContainer_icon" />
                 </div>
                 <div
-                    className={`arrowContainer_next${scrollStatus === 1 ? ' gray' : ''}`}
+                    className={`arrowContainer_next${
+                        scrollStatus === 1 ? " gray" : ""
+                    }`}
                     onClick={toRight}
                 >
                     <Icon className="arrowContainer_icon" />
@@ -191,7 +178,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
                 ref={scrollEl}
             >
                 <div className="storageCabinet_smallDeskRow" ref={ref}>
-                    {list.map((item, n) => {
+                    {colors.map((item, n) => {
                         return (
                             <div
                                 className="storageCabinet_item"
@@ -199,24 +186,20 @@ export const SmallDesk: React.FC<DeskProps> = ({
                                 data-i={n}
                                 onMouseUp={() => handleMouseUp(item, n)}
                             >
-                                <div className="storageCabinet_itemTitle">{item.name}</div>
+                                <div className="storageCabinet_itemTitle">
+                                    {item.name}
+                                </div>
                                 <div className="storageCabinet_itemValues">
                                     <Item
                                         values={item.values}
                                         handleChange={handleChange}
                                         handleValuesChange={(res) => {
-                                            const arr = JSON.parse(
-                                                JSON.stringify(listRef.current),
-                                            ) as typeof listRef.current;
-
+                                            const arr = [...listRef.current];
                                             arr[n].values = [...res];
-                                            if (
-                                                JSON.stringify(arr) !==
-                                                JSON.stringify(listRef.current)
-                                            ) {
-                                                listRef.current = [...arr];
-                                                setList([...listRef.current]);
-                                            }
+                                            listRef.current = [...arr];
+                                            handleColorChange([
+                                                ...listRef.current,
+                                            ]);
                                         }}
                                         index={n}
                                         value={value}

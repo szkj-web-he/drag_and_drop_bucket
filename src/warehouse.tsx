@@ -1,16 +1,25 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import { ConfigYML } from '@possie-engine/dr-plugin-sdk/config/yml';
-import { PluginComms } from '@possie-engine/dr-plugin-sdk/pluginComms';
-import React, { useEffect, useRef, useState } from 'react';
-import { useMContext } from './context';
-import { Product } from './product';
+import { ConfigYML } from "@possie-engine/dr-plugin-sdk/config/yml";
+import { PluginComms } from "@possie-engine/dr-plugin-sdk/pluginComms";
+import React, { useEffect, useRef, useState } from "react";
+import { useMContext } from "./context";
+import { Product } from "./product";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 const comms = new PluginComms({ defaultConfig: new ConfigYML() });
 // !等下放开
-// const fruits = comms.getConfigNode('fruits');
-import { fruits } from './defaultData';
+const _f = comms.getConfigNode("fruits");
+let fruits: string[] = [];
+for (let i = 0; i < _f.length; i++) {
+    if (!fruits.some((item) => item.toLowerCase() === _f[i].toLowerCase())) {
+        fruits.push(_f[i]);
+    } else {
+        console.log("重复水果", _f[i]);
+    }
+}
+
+// import { fruits } from './defaultData';
 
 /** This section will include all the interface for this tsx file */
 export interface WarehouseProps {
@@ -19,7 +28,10 @@ export interface WarehouseProps {
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => {
+export const Warehouse: React.FC<WarehouseProps> = ({
+    handleChange,
+    value,
+}) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
     const listRef = useRef(JSON.parse(JSON.stringify(fruits)) as Array<string>);
@@ -33,7 +45,10 @@ export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => 
     /************* This section will include this component parameter *************/
     useEffect(() => {
         const fn = () => {
-            if (mouseUpOnStorage.current && 'warehouse' in mouseUpOnStorage.current) {
+            if (
+                mouseUpOnStorage.current &&
+                "warehouse" in mouseUpOnStorage.current
+            ) {
                 const val = mouseUpOnStorage.current.warehouse;
 
                 const status = listRef.current.some((item) => item === val);
@@ -46,10 +61,10 @@ export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => 
                 }
             }
         };
-        document.addEventListener('touchend', fn);
+        document.addEventListener("touchend", fn);
 
         return () => {
-            document.removeEventListener('touchend', fn);
+            document.removeEventListener("touchend", fn);
         };
     }, [mouseUpOnStorage]);
 
@@ -70,7 +85,11 @@ export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => 
     };
 
     const onChange = (res: string | undefined) => {
-        if (mouseUpOnStorage.current && 'storageCabinet' in mouseUpOnStorage.current && !res) {
+        if (
+            mouseUpOnStorage.current &&
+            "storageCabinet" in mouseUpOnStorage.current &&
+            !res
+        ) {
             const data = mouseUpOnStorage.current.storageCabinet;
             const n = listRef.current.findIndex((item) => item === data.val);
             if (n >= 0) {
@@ -89,7 +108,9 @@ export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => 
         <div className="warehouse_wrap">
             <div className="warehouse_total">
                 共
-                <span className={`warehouse_totalVal${list.length ? '' : ' red'}`}>
+                <span
+                    className={`warehouse_totalVal${list.length ? "" : " red"}`}
+                >
                     {list.length}
                 </span>
                 项
@@ -97,7 +118,7 @@ export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => 
             <div className="warehouse_items" onMouseUp={handleMouseUp}>
                 <div
                     className="warehouse_placeholder"
-                    style={list.length ? { display: 'none' } : {}}
+                    style={list.length ? { display: "none" } : {}}
                 >
                     无可拖拽的选项
                 </div>

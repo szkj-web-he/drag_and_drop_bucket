@@ -1,12 +1,13 @@
-import './font';
-import './style.scss';
+import "./font";
+import "./style.scss";
 
-import { listenToParentIPC, render } from './boilerplate';
-import { Warehouse } from './warehouse';
-import { useEffect, useRef, useState } from 'react';
-import { StorageCabinet } from './storageCabinet';
-import { Context } from './context';
-import { isMobile } from './isMobile';
+import { listenToParentIPC, render } from "./boilerplate";
+import { Warehouse } from "./warehouse";
+import React, { useEffect, useRef, useState } from "react";
+import { StorageCabinet } from "./storageCabinet";
+import { Context } from "./context";
+import { isMobile } from "./isMobile";
+import { createPortal } from "react-dom";
 
 listenToParentIPC();
 
@@ -16,7 +17,8 @@ const Main = () => {
     const [selectItem, setSelectItem] = useState<string>();
 
     const status = useRef<
-        { warehouse: string } | { storageCabinet: { index: number; val: string } }
+        | { warehouse: string }
+        | { storageCabinet: { index: number; val: string } }
     >();
 
     const [mobileStatus, setMobileStatus] = useState(isMobile);
@@ -34,9 +36,9 @@ const Main = () => {
         const fn = () => {
             setMobileStatus(isMobile);
         };
-        window.addEventListener('resize', fn);
+        window.addEventListener("resize", fn);
         return () => {
-            window.removeEventListener('resize', fn);
+            window.removeEventListener("resize", fn);
         };
     }, []);
 
@@ -54,8 +56,14 @@ const Main = () => {
             }}
         >
             <div className="wrapper">
-                <Warehouse handleChange={(res) => setSelectItem(res)} value={selectItem} />
-                <StorageCabinet handleChange={(res) => setSelectItem(res)} value={selectItem} />
+                <Warehouse
+                    handleChange={(res) => setSelectItem(res)}
+                    value={selectItem}
+                />
+                <StorageCabinet
+                    handleChange={(res) => setSelectItem(res)}
+                    value={selectItem}
+                />
             </div>
 
             {!!position &&
@@ -69,16 +77,11 @@ const Main = () => {
                     >
                         {selectItem}
                     </div>,
-                    document.body,
+                    document.body
                 )}
         </Context.Provider>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */
 
-import VConsole from 'vconsole';
-import { createPortal } from 'react-dom';
-
-// or init with options
-new VConsole({ theme: 'dark' });
 render(<Main />);

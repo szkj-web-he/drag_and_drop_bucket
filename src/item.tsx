@@ -1,9 +1,9 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React from 'react';
-import { useMContext } from './context';
-import { Product } from './product';
-import { ScrollComponent } from './Scroll';
+import React from "react";
+import { useMContext } from "./context";
+import { Product } from "./product";
+import { ScrollComponent } from "./Scroll";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -36,12 +36,16 @@ export const Item: React.FC<ItemProps> = ({
     const onChange = (res: string | undefined) => {
         const data = mouseUpOnStorage.current;
         if (data && !res) {
-            const val = 'warehouse' in data ? data.warehouse : data.storageCabinet.val;
+            const val =
+                "warehouse" in data ? data.warehouse : data.storageCabinet.val;
 
             const n = values.findIndex((item) => item === val);
 
-            if (n >= 0 && ('warehouse' in data || data.storageCabinet.index !== index)) {
-                const arr = [...values];
+            if (
+                n >= 0 &&
+                ("warehouse" in data || data.storageCabinet.index !== index)
+            ) {
+                const arr = JSON.parse(JSON.stringify(values));
                 arr.splice(n, 1);
                 handleValuesChange([...arr]);
             }
