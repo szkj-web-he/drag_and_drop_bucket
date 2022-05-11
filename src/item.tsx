@@ -4,14 +4,16 @@ import React from "react";
 import { useMContext } from "./context";
 import { Product } from "./product";
 import { ScrollComponent } from "./Scroll";
+import { ListItemProps } from "./storageCabinet";
+import { OptionProps } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 export interface ItemProps {
-    handleChange: (res: string | undefined) => void;
-    value?: string;
-    values: string[];
-    handleValuesChange: (res: string[]) => void;
+    handleChange: (res: OptionProps | undefined) => void;
+    value?: OptionProps;
+    values: OptionProps[];
+    handleValuesChange: (res: OptionProps[]) => void;
     index: number;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
@@ -33,7 +35,7 @@ export const Item: React.FC<ItemProps> = ({
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
-    const onChange = (res: string | undefined) => {
+    const onChange = (res: OptionProps | undefined) => {
         const data = mouseUpOnStorage.current;
         if (data && !res) {
             const val =
@@ -45,7 +47,7 @@ export const Item: React.FC<ItemProps> = ({
                 n >= 0 &&
                 ("warehouse" in data || data.storageCabinet.index !== index)
             ) {
-                const arr = JSON.parse(JSON.stringify(values));
+                const arr = JSON.parse(JSON.stringify(values)) as OptionProps[];
                 arr.splice(n, 1);
                 handleValuesChange([...arr]);
             }

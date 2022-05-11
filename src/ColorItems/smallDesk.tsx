@@ -4,6 +4,7 @@ import { Item } from "../item";
 import { ScrollComponent } from "../Scroll";
 import { Icon } from "../icon";
 import { DeskProps } from "./desk";
+import { ListItemProps } from "../storageCabinet";
 
 export const SmallDesk: React.FC<DeskProps> = ({
     colors,
@@ -33,7 +34,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
         const el = scrollEl.current;
         if (!el) return;
         let node: null | Element = null;
-        for (let i = 0; i < el.children.length; ) {
+        for (let i = 0; i < el.children.length;) {
             const item = el.children[i];
             if (
                 item
@@ -105,11 +106,11 @@ export const SmallDesk: React.FC<DeskProps> = ({
     }, [position]);
 
     const handleMouseUp = (
-        { values }: { name: string; values: string[] },
+        { values }: ListItemProps,
         n: number
     ) => {
         if (!value) return;
-        const status = values.some((val) => val === value);
+        const status = values.some((val) => val.code === value.code);
         if (!status) {
             values.push(value);
         }
@@ -154,17 +155,15 @@ export const SmallDesk: React.FC<DeskProps> = ({
         <>
             <div className="arrowContainer">
                 <div
-                    className={`arrowContainer_pre${
-                        scrollStatus === 0 ? " gray" : ""
-                    }`}
+                    className={`arrowContainer_pre${scrollStatus === 0 ? " gray" : ""
+                        }`}
                     onClick={toLeft}
                 >
                     <Icon className="arrowContainer_icon" />
                 </div>
                 <div
-                    className={`arrowContainer_next${
-                        scrollStatus === 1 ? " gray" : ""
-                    }`}
+                    className={`arrowContainer_next${scrollStatus === 1 ? " gray" : ""
+                        }`}
                     onClick={toRight}
                 >
                     <Icon className="arrowContainer_icon" />
@@ -182,12 +181,12 @@ export const SmallDesk: React.FC<DeskProps> = ({
                         return (
                             <div
                                 className="storageCabinet_item"
-                                key={item.name}
+                                key={item.code}
                                 data-i={n}
                                 onMouseUp={() => handleMouseUp(item, n)}
                             >
                                 <div className="storageCabinet_itemTitle">
-                                    {item.name}
+                                    {item.content}
                                 </div>
                                 <div className="storageCabinet_itemValues">
                                     <Item

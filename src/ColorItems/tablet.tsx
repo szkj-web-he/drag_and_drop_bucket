@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ListItemProps } from "~/storageCabinet";
 import { useMContext } from "../context";
 import { Item } from "../item";
 import {
@@ -94,6 +95,19 @@ export const Tablet: React.FC<DeskProps> = ({
         };
     }, []);
 
+    useEffect(() => {
+        const fn = () => {
+            const el = ref.current;
+            if (!el) return;
+            el.style.transform = `translateX(${(currentPage ? -currentPage : currentPage) * el.offsetWidth
+                }px)`;
+        };
+        window.addEventListener("resize", fn);
+        return () => {
+            window.removeEventListener('resize', fn)
+        }
+    }, [currentPage])
+
     /**
      * 滑块功能 start
      */
@@ -161,9 +175,8 @@ export const Tablet: React.FC<DeskProps> = ({
         } else if (value > total) {
             value = total;
         }
-        el.style.transform = `translateX(${
-            (value ? -value : value) * el.offsetWidth
-        }px)`;
+        el.style.transform = `translateX(${(value ? -value : value) * el.offsetWidth
+            }px)`;
         setCurrentPage(value);
         addClassName("transition");
     };
@@ -189,9 +202,8 @@ export const Tablet: React.FC<DeskProps> = ({
             if (Math.abs(v) > 0.5 && v !== 0) {
                 executionGestures();
             } else {
-                el.style.transform = `translateX(${
-                    (currentPage ? -currentPage : currentPage) * el.offsetWidth
-                }px)`;
+                el.style.transform = `translateX(${(currentPage ? -currentPage : currentPage) * el.offsetWidth
+                    }px)`;
                 addClassName("transition");
             }
         }
@@ -232,7 +244,7 @@ export const Tablet: React.FC<DeskProps> = ({
         if (
             typeof touchData.current.y === "number" &&
             Math.abs(y - touchData.current.y) >
-                Math.abs(x - touchData.current.x)
+            Math.abs(x - touchData.current.x)
         ) {
             handleTouchCancel();
 
@@ -244,7 +256,7 @@ export const Tablet: React.FC<DeskProps> = ({
          */
         if (touchData.current.status === null) {
             const attr = getMatrixAttr(el);
-            const val = Number(attr?.translateX) || 0;
+            const val = (Number(attr?.translateX) || 0);
             touchData.current.val = val;
             removeClass(el, "transition");
         }
@@ -362,10 +374,7 @@ export const Tablet: React.FC<DeskProps> = ({
      * 每6个一组
      */
     const colorList: Array<
-        Array<{
-            name: string;
-            values: string[];
-        }>
+        Array<ListItemProps>
     > = [];
 
     let start = -1;
@@ -394,11 +403,11 @@ export const Tablet: React.FC<DeskProps> = ({
                                     return (
                                         <li
                                             className="storageCabinet_item"
-                                            key={item.name}
+                                            key={item.code}
                                             data-i={n * 6 + index}
                                         >
                                             <div className="storageCabinet_itemTitle">
-                                                {item.name}
+                                                {item.content}
                                             </div>
                                             <div className="storageCabinet_itemValues">
                                                 <Item
@@ -449,9 +458,8 @@ export const Tablet: React.FC<DeskProps> = ({
                     {colorList.map((_, n) => {
                         return (
                             <span
-                                className={`tablet_pageItem${
-                                    currentPage === n ? " active" : ""
-                                }`}
+                                className={`tablet_pageItem${currentPage === n ? " active" : ""
+                                    }`}
                                 key={`page${n}`}
                                 onTouchStart={(e) => e.stopPropagation()}
                                 onClick={() => {

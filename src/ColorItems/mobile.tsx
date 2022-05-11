@@ -57,11 +57,11 @@ export const Mobile: React.FC<DeskProps> = ({
                     return (
                         <div
                             className="storageCabinet_item"
-                            key={item.name}
+                            key={item.code}
                             data-i={n}
                         >
                             <div className="storageCabinet_itemTitle">
-                                {item.name}
+                                {item.content}
                             </div>
                             <div className="storageCabinet_itemValues">
                                 <Item

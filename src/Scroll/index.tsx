@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import "./style.scss";
 import { setScrollBar } from "./Unit/setScrollBar";
-import { stopSelect } from "./Unit/noSelected";
+import { stopSelect } from "../noSelected";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -297,13 +297,12 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          */
         const verticalBar =
             hidden === true ||
-            (typeof hidden === "object" && hidden?.y === true) ? (
+                (typeof hidden === "object" && hidden?.y === true) ? (
                 <></>
             ) : (
                 <div
-                    className={`scroll_scrollBar__vertical${
-                        hover || focus ? " active" : ""
-                    }`}
+                    className={`scroll_scrollBar__vertical${hover || focus ? " active" : ""
+                        }`}
                     onMouseDown={handleMouseDownOnVerticalBar}
                     onClick={(e) => stopPropagation && e.stopPropagation()}
                 />
@@ -314,13 +313,12 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
          */
         const horizontalBar =
             hidden === true ||
-            (typeof hidden === "object" && hidden?.x === true) ? (
+                (typeof hidden === "object" && hidden?.x === true) ? (
                 <></>
             ) : (
                 <div
-                    className={`scroll_scrollBar__horizontal${
-                        hover || focus ? " active" : ""
-                    }`}
+                    className={`scroll_scrollBar__horizontal${hover || focus ? " active" : ""
+                        }`}
                     onMouseDown={handleMouseDownOnHorizontalBar}
                     onClick={(e) => stopPropagation && e.stopPropagation()}
                 />

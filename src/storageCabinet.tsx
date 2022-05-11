@@ -10,25 +10,25 @@ import { PluginComms } from "@possie-engine/dr-plugin-sdk/pluginComms";
 /** This section will include all the interface for this tsx file */
 const comms = new PluginComms({ defaultConfig: new ConfigYML() });
 
-// !等下放开
-const _f: string[] = comms.getConfigNode("colors");
-// console.log({a})
-let colors: string[] = [];
-for (let i = 0; i < _f.length; i++) {
-    if (!colors.some((item) => item.toLowerCase() === _f[i].toLowerCase())) {
-        colors.push(_f[i]);
-    } else {
-        console.log("重复", _f[i]);
-    }
-}
+const options = comms.getConfigNode('options')[0] as Array<OptionProps>;
+
+// const colors = options.map(item => { const key = Object.keys(item)[0]; return item[key] });
+
 // import { colors } from './defaultData';
 import { Desk } from "./ColorItems/desk";
 import { SmallDesk } from "./ColorItems/smallDesk";
 import { Tablet } from "./ColorItems/tablet";
 import { Mobile } from "./ColorItems/mobile";
+import { OptionProps } from "./unit";
 export interface StorageCabinetProps {
-    handleChange: (res: string | undefined) => void;
-    value?: string;
+    handleChange: (res: OptionProps | undefined) => void;
+    value?: OptionProps;
+}
+
+export interface ListItemProps {
+    code: string;
+    content: string;
+    values: OptionProps[];
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
@@ -50,13 +50,11 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({
     );
 
     const [list, setList] = useState<
-        Array<{
-            name: string;
-            values: string[];
-        }>
+        Array<ListItemProps>
     >(
-        colors.map((item) => ({
-            name: item,
+        options.map((item) => ({
+            code: item.code,
+            content: item.content,
             values: [],
         }))
     );
@@ -81,16 +79,12 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({
     /************* This section will include this component general function *************/
 
     const handleColorChange = (
-        res: {
-            name: string;
-            values: string[];
-        }[]
+        res: ListItemProps[]
     ) => {
         setList([...res]);
         const data: Record<string, string> = {};
         for (let i = 0; i < res.length; i++) {
-            const item = res[i];
-            data[item.name] = item.values.join(",");
+            data[res[i].code] = JSON.stringify(res[i].values.map(item => item.code))
         }
         updateStateListener(data);
     };

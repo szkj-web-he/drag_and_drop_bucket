@@ -8,17 +8,18 @@ import { StorageCabinet } from "./storageCabinet";
 import { Context } from "./context";
 import { isMobile } from "./isMobile";
 import { createPortal } from "react-dom";
+import { OptionProps } from "./unit";
 
 listenToParentIPC();
 
 const Main = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [selectItem, setSelectItem] = useState<string>();
+    const [selectItem, setSelectItem] = useState<OptionProps>();
 
     const status = useRef<
-        | { warehouse: string }
-        | { storageCabinet: { index: number; val: string } }
+        | { warehouse: OptionProps }
+        | { storageCabinet: { index: number; val: OptionProps } }
     >();
 
     const [mobileStatus, setMobileStatus] = useState(isMobile);
@@ -75,7 +76,7 @@ const Main = () => {
                             top: `${position.y}px`,
                         }}
                     >
-                        {selectItem}
+                        {selectItem?.content}
                     </div>,
                     document.body
                 )}

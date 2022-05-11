@@ -4,14 +4,15 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { stopSelect } from './noSelected';
 import { useMContext } from './context';
 import { getScrollValue } from './getScrollValue';
+import { OptionProps } from './unit';
 
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 export interface ProductProps {
-    list: Array<string>;
-    handleChange: (res: string | undefined) => void;
-    value?: string;
+    list: Array<OptionProps>;
+    handleChange: (res: OptionProps | undefined) => void;
+    value?: OptionProps;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
@@ -99,7 +100,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         const y = position.pageY;
         const els = document.elementsFromPoint(x, y);
 
-        for (let i = 0; i < els.length; ) {
+        for (let i = 0; i < els.length;) {
             const el = els[i];
 
             if (el.nodeName !== 'HTML' && el.nodeName !== 'BODY') {
@@ -125,7 +126,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
 
     // 手或者鼠标 按下的通用事件
     const handleDown = (
-        item: string,
+        item: OptionProps,
         e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
         position: {
             x: number;
@@ -154,7 +155,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     };
 
     // 当鼠标按下时
-    const handleMouseDown = (item: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const handleMouseDown = (item: OptionProps, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         handleDown(item, e, {
             x: e.pageX,
             y: e.pageY,
@@ -164,7 +165,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
     };
 
     //当手触摸时
-    const handleTouchStart = (item: string, e: React.TouchEvent<HTMLDivElement>) => {
+    const handleTouchStart = (item: OptionProps, e: React.TouchEvent<HTMLDivElement>) => {
         const position = e.changedTouches[0];
         e.stopPropagation();
         handleDown(item, e, {
@@ -180,22 +181,22 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
                 return (
                     <div
                         className={`item${value === item ? ' gray' : ''}`}
-                        key={item}
+                        key={item.code}
                         {...(isMobile
                             ? {
-                                  onTouchStart: (e) => {
-                                      handleTouchStart(item, e);
-                                  },
-                                  onTouchMove: handleMove,
-                                  onTouchEnd: handleTouchEnd,
-                              }
+                                onTouchStart: (e) => {
+                                    handleTouchStart(item, e);
+                                },
+                                onTouchMove: handleMove,
+                                onTouchEnd: handleTouchEnd,
+                            }
                             : {
-                                  onMouseDown: (e) => {
-                                      handleMouseDown(item, e);
-                                  },
-                              })}
+                                onMouseDown: (e) => {
+                                    handleMouseDown(item, e);
+                                },
+                            })}
                     >
-                        {item}
+                        {item.content}
                     </div>
                 );
             })}

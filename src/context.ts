@@ -1,14 +1,15 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from "react";
+import { OptionProps } from "./unit";
 
 interface ContextDataProps {
     mouseUpOnStorage: React.MutableRefObject<
         | {
-              warehouse: string;
+              warehouse: OptionProps;
           }
         | {
               storageCabinet: {
                   index: number;
-                  val: string;
+                  val: OptionProps;
               };
           }
         | undefined

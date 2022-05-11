@@ -1,18 +1,13 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Item } from "../item";
 import { useMContext } from "../context";
-import { StorageCabinetProps } from "../storageCabinet";
+import { ListItemProps, StorageCabinetProps } from "../storageCabinet";
+import { OptionProps } from "../unit";
 
 export interface DeskProps extends StorageCabinetProps {
-    colors: Array<{
-        name: string;
-        values: string[];
-    }>;
+    colors: Array<ListItemProps>;
     handleColorChange: (
-        res: {
-            name: string;
-            values: string[];
-        }[]
+        res: ListItemProps[]
     ) => void;
 }
 
@@ -67,11 +62,11 @@ export const Desk: React.FC<DeskProps> = ({
     }, [position]);
 
     const handleMouseUp = (
-        { values }: { name: string; values: string[] },
+        { values }: ListItemProps,
         n: number
     ) => {
         if (!value) return;
-        const status = values.some((val) => val === value);
+        const status = values.some((val) => val.code === value.code);
         if (!status) {
             values.push(value);
         }
@@ -95,12 +90,12 @@ export const Desk: React.FC<DeskProps> = ({
                 return (
                     <div
                         className="storageCabinet_item"
-                        key={`${item.name}`}
+                        key={`${item.code}`}
                         data-i={n}
                         onMouseUp={() => handleMouseUp(item, n)}
                     >
                         <div className="storageCabinet_itemTitle">
-                            {item.name}
+                            {item.content}
                         </div>
                         <div className="storageCabinet_itemValues">
                             <Item
