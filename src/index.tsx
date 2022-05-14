@@ -8,18 +8,17 @@ import { StorageCabinet } from "./storageCabinet";
 import { Context } from "./context";
 import { isMobile } from "./isMobile";
 import { createPortal } from "react-dom";
-import { OptionProps } from "./unit";
+import { deepCloneData, DragData, OptionProps } from "./unit";
 
 listenToParentIPC();
 
 const Main = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [selectItem, setSelectItem] = useState<OptionProps>();
+    const [selectItem, setSelectItem] = useState<DragData>();
 
     const status = useRef<
-        | { warehouse: OptionProps }
-        | { storageCabinet: { index: number; val: OptionProps } }
+        { index: number; val: OptionProps }
     >();
 
     const [mobileStatus, setMobileStatus] = useState(isMobile);
@@ -58,12 +57,12 @@ const Main = () => {
         >
             <div className="wrapper">
                 <Warehouse
-                    handleChange={(res) => setSelectItem(res)}
-                    value={selectItem}
+                    handleChange={(res) => { setSelectItem(deepCloneData(res)) }}
+                    value={deepCloneData(selectItem)}
                 />
                 <StorageCabinet
-                    handleChange={(res) => setSelectItem(res)}
-                    value={selectItem}
+                    handleChange={(res) => { setSelectItem(deepCloneData(res)) }}
+                    value={deepCloneData(selectItem)}
                 />
             </div>
 

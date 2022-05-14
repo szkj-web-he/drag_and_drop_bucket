@@ -4,19 +4,22 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { stopSelect } from './noSelected';
 import { useMContext } from './context';
 import { getScrollValue } from './getScrollValue';
-import { OptionProps } from './unit';
+import { DragData, OptionProps } from './unit';
 
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 export interface ProductProps {
     list: Array<OptionProps>;
-    handleChange: (res: OptionProps | undefined) => void;
-    value?: OptionProps;
+    handleChange: (res: DragData | undefined) => void;
+    value?: DragData;
+    placement: "warehouse" | "storageCabinet",
+    index?: number;
+    onUp: (res: OptionProps | undefined) => void
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) => {
+export const Product: React.FC<ProductProps> = ({ list, handleChange, value, placement, index, onUp }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
@@ -31,14 +34,14 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         y: 0,
     });
 
-    const valRef = useRef(value);
+    const valRef = useRef(value ? { code: value.code, content: value.content } : undefined);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
     useLayoutEffect(() => {
-        valRef.current = value;
+        valRef.current = value ? { code: value.code, content: value.content } : undefined;
     }, [value]);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
@@ -80,7 +83,7 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         };
 
         setPosition(undefined);
-        handleChange(undefined);
+        onUp(valRef.current);
     };
 
     // 当鼠标弹起时
@@ -109,12 +112,11 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
                     const n = el.getAttribute('data-i');
                     if (n) {
                         mouseUpOnStorage.current = {
-                            storageCabinet: { index: Number(n), val: valRef.current },
+                            index: Number(n), val: {
+                                ...valRef.current
+                            }
                         };
                     }
-                    i = els.length;
-                } else if (className?.includes('warehouse_items')) {
-                    mouseUpOnStorage.current = { warehouse: valRef.current };
                     i = els.length;
                 }
             }
@@ -133,7 +135,12 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
             y: number;
         },
     ) => {
-        handleChange(item);
+
+        handleChange({
+            code: item.code,
+            content: item.content,
+            placement: (placement === 'warehouse' ? 'warehouse' : { "storageCabinet": index || 0 })
+        });
         stopSelect(e, selectedFn, true);
 
         const scrollData = getScrollValue();
@@ -174,13 +181,22 @@ export const Product: React.FC<ProductProps> = ({ list, handleChange, value }) =
         });
     };
 
+    let isGray = false;
+    if (value) {
+        if (placement === 'warehouse' && value.placement === placement) {
+            isGray = true;
+        } else if (placement === "storageCabinet" && JSON.stringify(value.placement) === JSON.stringify({ ["storageCabinet"]: index })) {
+            isGray = true;
+        }
+    }
+
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <>
             {list.map((item) => {
                 return (
                     <div
-                        className={`item${value === item ? ' gray' : ''}`}
+                        className={`item${value?.code === item.code && isGray ? ' gray' : ''}`}
                         key={item.code}
                         {...(isMobile
                             ? {

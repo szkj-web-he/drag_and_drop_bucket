@@ -1,4 +1,6 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { ListItemProps } from "../storageCabinet";
+import { OptionProps } from "../unit";
 import { useMContext } from "../context";
 import { Item } from "../item";
 import { DeskProps } from "./desk";
@@ -13,6 +15,22 @@ export const Mobile: React.FC<DeskProps> = ({
 
     const { mouseUpOnStorage } = useMContext();
 
+
+    const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
+
+        const data = mouseUpOnStorage.current;
+
+        if (n === data?.index) { return }
+
+        const index = item.values.findIndex(val => val.code === res?.code);
+        if (index >= 0) {
+            item.values.splice(index, 1)
+        }
+
+        handleColorChange([...listRef.current]);
+        handleChange(undefined)
+    };
+
     useLayoutEffect(() => {
         listRef.current = [...colors];
     }, [colors]);
@@ -24,14 +42,13 @@ export const Mobile: React.FC<DeskProps> = ({
     useEffect(() => {
         const fn = () => {
             if (
-                mouseUpOnStorage.current &&
-                "storageCabinet" in mouseUpOnStorage.current
+                mouseUpOnStorage.current
             ) {
-                const data = mouseUpOnStorage.current["storageCabinet"];
+                const data = mouseUpOnStorage.current;
                 const n = data.index;
                 const values = listRef.current[n].values;
                 const val = data.val;
-                const status = values.some((item) => item === val);
+                const status = values.some((item) => item.code === val.code);
 
                 if (!status) {
                     values.push(val);
@@ -48,6 +65,7 @@ export const Mobile: React.FC<DeskProps> = ({
         return () => {
             document.removeEventListener("touchend", fn);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mouseUpOnStorage]);
 
     return (
@@ -67,22 +85,7 @@ export const Mobile: React.FC<DeskProps> = ({
                                 <Item
                                     values={item.values}
                                     handleChange={handleChange}
-                                    handleValuesChange={(res) => {
-                                        const arr = JSON.parse(
-                                            JSON.stringify(listRef.current)
-                                        ) as typeof listRef.current;
-
-                                        arr[n].values = [...res];
-                                        if (
-                                            JSON.stringify(arr) !==
-                                            JSON.stringify(listRef.current)
-                                        ) {
-                                            listRef.current = [...arr];
-                                            handleColorChange([
-                                                ...listRef.current,
-                                            ]);
-                                        }
-                                    }}
+                                    onUp={(res) => handleUp(item, n, res)}
                                     index={n}
                                     value={value}
                                 />

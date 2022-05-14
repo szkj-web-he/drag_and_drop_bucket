@@ -4,13 +4,8 @@ import { OptionProps } from "./unit";
 interface ContextDataProps {
     mouseUpOnStorage: React.MutableRefObject<
         | {
-              warehouse: OptionProps;
-          }
-        | {
-              storageCabinet: {
-                  index: number;
-                  val: OptionProps;
-              };
+              index: number;
+              val: OptionProps;
           }
         | undefined
     >;
@@ -39,4 +34,4 @@ const contextData = (): ContextDataProps => ({
 
 export const Context = createContext(contextData());
 
-export const useMContext = () => useContext(Context);
+export const useMContext = (): ContextDataProps => useContext(Context);

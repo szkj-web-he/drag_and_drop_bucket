@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { Item } from "../item";
 import { useMContext } from "../context";
 import { ListItemProps, StorageCabinetProps } from "../storageCabinet";
@@ -22,6 +22,7 @@ export const Desk: React.FC<DeskProps> = ({
     const { mouseUpOnStorage, position } = useMContext();
 
     const ref = useRef<HTMLDivElement | null>(null);
+
 
     useLayoutEffect(() => {
         listRef.current = [...colors];
@@ -63,25 +64,49 @@ export const Desk: React.FC<DeskProps> = ({
 
     const handleMouseUp = (
         { values }: ListItemProps,
-        n: number
+        n: number,
+
     ) => {
+
         if (!value) return;
         const status = values.some((val) => val.code === value.code);
         if (!status) {
-            values.push(value);
+            values.push({
+                code: value.code,
+                content: value.content
+            });
         }
         const arr = [...listRef.current];
+
         arr[n].values = [...values];
 
         listRef.current = [...arr];
+
+
         handleColorChange([...listRef.current]);
 
         mouseUpOnStorage.current = {
-            storageCabinet: {
-                index: n,
-                val: value,
+            index: n,
+            val: {
+                code: value.code,
+                content: value.content
             },
         };
+    };
+
+    const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
+
+        const data = mouseUpOnStorage.current;
+
+        if (n === data?.index) { return }
+
+        const index = item.values.findIndex(val => val.code === res?.code);
+        if (index >= 0) {
+            item.values.splice(index, 1)
+        }
+
+        handleColorChange([...listRef.current]);
+        handleChange(undefined)
     };
 
     return (
@@ -101,14 +126,9 @@ export const Desk: React.FC<DeskProps> = ({
                             <Item
                                 values={item.values}
                                 handleChange={handleChange}
-                                handleValuesChange={(res) => {
-                                    const arr = [...listRef.current];
-                                    arr[n].values = [...res];
-                                    listRef.current = [...arr];
-                                    handleColorChange([...listRef.current]);
-                                }}
+                                onUp={(res) => handleUp(item, n, res)}
                                 index={n}
-                                value={value}
+                                value={value ? JSON.parse(JSON.stringify(value)) : undefined}
                             />
                         </div>
                     </div>

@@ -5,6 +5,7 @@ import { ScrollComponent } from "../Scroll";
 import { Icon } from "../icon";
 import { DeskProps } from "./desk";
 import { ListItemProps } from "../storageCabinet";
+import { OptionProps } from "../unit";
 
 export const SmallDesk: React.FC<DeskProps> = ({
     colors,
@@ -121,10 +122,8 @@ export const SmallDesk: React.FC<DeskProps> = ({
         handleColorChange([...listRef.current]);
 
         mouseUpOnStorage.current = {
-            storageCabinet: {
-                index: n,
-                val: value,
-            },
+            index: n,
+            val: value,
         };
     };
 
@@ -149,6 +148,21 @@ export const SmallDesk: React.FC<DeskProps> = ({
         } else {
             setScrollStatus(2);
         }
+    };
+
+    const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
+
+        const data = mouseUpOnStorage.current;
+
+        if (n === data?.index) { return }
+
+        const index = item.values.findIndex(val => val.code === res?.code);
+        if (index >= 0) {
+            item.values.splice(index, 1)
+        }
+
+        handleColorChange([...listRef.current]);
+        handleChange(undefined)
     };
 
     return (
@@ -192,14 +206,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
                                     <Item
                                         values={item.values}
                                         handleChange={handleChange}
-                                        handleValuesChange={(res) => {
-                                            const arr = [...listRef.current];
-                                            arr[n].values = [...res];
-                                            listRef.current = [...arr];
-                                            handleColorChange([
-                                                ...listRef.current,
-                                            ]);
-                                        }}
+                                        onUp={(res) => handleUp(item, n, res)}
                                         index={n}
                                         value={value}
                                     />

@@ -4,16 +4,15 @@ import React from "react";
 import { useMContext } from "./context";
 import { Product } from "./product";
 import { ScrollComponent } from "./Scroll";
-import { ListItemProps } from "./storageCabinet";
-import { OptionProps } from "./unit";
+import { deepCloneData, DragData, OptionProps } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 export interface ItemProps {
-    handleChange: (res: OptionProps | undefined) => void;
-    value?: OptionProps;
+    handleChange: (res: DragData | undefined) => void;
+    value?: DragData;
     values: OptionProps[];
-    handleValuesChange: (res: OptionProps[]) => void;
+    onUp: (res: OptionProps | undefined) => void;
     index: number;
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
@@ -22,47 +21,21 @@ export const Item: React.FC<ItemProps> = ({
     handleChange,
     value,
     values,
-    handleValuesChange,
+    onUp,
     index,
 }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const { mouseUpOnStorage, isMobile } = useMContext();
-    /* <------------------------------------ **** STATE END **** ------------------------------------ */
-    /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
-    /************* This section will include this component parameter *************/
-
-    /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
-    /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
-    /************* This section will include this component general function *************/
-    const onChange = (res: OptionProps | undefined) => {
-        const data = mouseUpOnStorage.current;
-        if (data && !res) {
-            const val =
-                "warehouse" in data ? data.warehouse : data.storageCabinet.val;
-
-            const n = values.findIndex((item) => item === val);
-
-            if (
-                n >= 0 &&
-                ("warehouse" in data || data.storageCabinet.index !== index)
-            ) {
-                const arr = JSON.parse(JSON.stringify(values)) as OptionProps[];
-                arr.splice(n, 1);
-                handleValuesChange([...arr]);
-            }
-        }
-        handleChange(res);
-    };
+    const { isMobile } = useMContext();
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return isMobile ? (
         <div className="mobileScroll">
-            <Product list={values} handleChange={onChange} value={value} />
+            <Product list={deepCloneData(values)} handleChange={handleChange} value={deepCloneData(value)} index={index} onUp={onUp} placement="storageCabinet" />
         </div>
     ) : (
         <ScrollComponent>
-            <Product list={values} handleChange={onChange} value={value} />
+            <Product list={deepCloneData(values)} handleChange={handleChange} value={deepCloneData(value)} index={index} onUp={onUp} placement="storageCabinet" />
         </ScrollComponent>
     );
 };

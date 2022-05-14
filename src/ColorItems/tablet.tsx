@@ -1,11 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ListItemProps } from "~/storageCabinet";
+import { ListItemProps } from "../storageCabinet";
 import { useMContext } from "../context";
 import { Item } from "../item";
 import {
     addClass,
     getMatrixAttr,
     getTransitionAttr,
+    OptionProps,
     removeClass,
 } from "../unit";
 import { DeskProps } from "./desk";
@@ -63,10 +64,9 @@ export const Tablet: React.FC<DeskProps> = ({
     useEffect(() => {
         const fn = () => {
             if (
-                mouseUpOnStorage.current &&
-                "storageCabinet" in mouseUpOnStorage.current
+                mouseUpOnStorage.current
             ) {
-                const data = mouseUpOnStorage.current["storageCabinet"];
+                const data = mouseUpOnStorage.current;
                 const n = data.index;
                 const values = listRef.current[n].values;
                 const val = data.val;
@@ -87,6 +87,7 @@ export const Tablet: React.FC<DeskProps> = ({
         return () => {
             document.removeEventListener("touchend", fn);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mouseUpOnStorage]);
 
     useEffect(() => {
@@ -389,6 +390,21 @@ export const Tablet: React.FC<DeskProps> = ({
         }
     });
 
+    const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
+
+        const data = mouseUpOnStorage.current;
+
+        if (n === data?.index) { return }
+
+        const index = item.values.findIndex(val => val.code === res?.code);
+        if (index >= 0) {
+            item.values.splice(index, 1)
+        }
+
+        handleColorChange([...listRef.current]);
+        handleChange(undefined)
+    };
+
     return (
         <div className="tablet_colorWrap">
             <div
@@ -413,34 +429,7 @@ export const Tablet: React.FC<DeskProps> = ({
                                                 <Item
                                                     values={item.values}
                                                     handleChange={handleChange}
-                                                    handleValuesChange={(
-                                                        res
-                                                    ) => {
-                                                        const arr = JSON.parse(
-                                                            JSON.stringify(
-                                                                listRef.current
-                                                            )
-                                                        ) as typeof listRef.current;
-
-                                                        arr[
-                                                            n * 6 + index
-                                                        ].values = [...res];
-                                                        if (
-                                                            JSON.stringify(
-                                                                arr
-                                                            ) !==
-                                                            JSON.stringify(
-                                                                listRef.current
-                                                            )
-                                                        ) {
-                                                            listRef.current = [
-                                                                ...arr,
-                                                            ];
-                                                            handleColorChange([
-                                                                ...listRef.current,
-                                                            ]);
-                                                        }
-                                                    }}
+                                                    onUp={(res) => handleUp(item, n * 6 + index, res)}
                                                     index={n * 6 + index}
                                                     value={value}
                                                 />

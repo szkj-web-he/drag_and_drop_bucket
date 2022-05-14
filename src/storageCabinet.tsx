@@ -19,10 +19,10 @@ import { Desk } from "./ColorItems/desk";
 import { SmallDesk } from "./ColorItems/smallDesk";
 import { Tablet } from "./ColorItems/tablet";
 import { Mobile } from "./ColorItems/mobile";
-import { OptionProps } from "./unit";
+import { deepCloneData, DragData, OptionProps } from "./unit";
 export interface StorageCabinetProps {
-    handleChange: (res: OptionProps | undefined) => void;
-    value?: OptionProps;
+    handleChange: (res: DragData | undefined) => void;
+    value?: DragData;
 }
 
 export interface ListItemProps {
@@ -52,11 +52,12 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({
     const [list, setList] = useState<
         Array<ListItemProps>
     >(
-        options.map((item) => ({
-            code: item.code,
-            content: item.content,
-            values: [],
-        }))
+        deepCloneData(options)
+            .map((item) => ({
+                code: item.code,
+                content: item.content,
+                values: [],
+            }))
     );
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
@@ -93,17 +94,19 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({
 
     let mainEl = <></>;
 
+    const valueData = deepCloneData(value);
+
     if (isMobile) {
         mainEl = is375 ? (
             <Mobile
-                value={value}
+                value={valueData}
                 handleChange={handleChange}
                 handleColorChange={handleColorChange}
                 colors={list}
             />
         ) : (
             <Tablet
-                value={value}
+                value={valueData}
                 handleChange={handleChange}
                 handleColorChange={handleColorChange}
                 colors={list}
@@ -112,14 +115,14 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({
     } else {
         mainEl = is1024 ? (
             <SmallDesk
-                value={value}
+                value={valueData}
                 handleChange={handleChange}
                 handleColorChange={handleColorChange}
                 colors={list}
             />
         ) : (
             <Desk
-                value={value}
+                value={valueData}
                 handleChange={handleChange}
                 handleColorChange={handleColorChange}
                 colors={list}

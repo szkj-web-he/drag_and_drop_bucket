@@ -5,7 +5,11 @@ export interface OptionProps {
     content: string;
 }
 
-export const getTimeout = (delays: string[], durations: string[]) =>
+export interface DragData extends OptionProps {
+    placement: "warehouse" | { storageCabinet: number };
+}
+
+export const getTimeout = (delays: string[], durations: string[]): number =>
     delays.length > durations.length
         ? Math.max(...delays.map((item, n) => toMs(item) + toMs(durations[n])))
         : Math.max(...durations.map((item, n) => toMs(item) + toMs(delays[n])));
@@ -15,7 +19,7 @@ export const getTimeout = (delays: string[], durations: string[]) =>
  * @returns {timeout: number;propCount: number;}
  */
 export const getTransitionAttr = (
-    el: HTMLElement
+    el: HTMLElement,
 ): {
     timeout: number;
     propCount: number;
@@ -43,7 +47,7 @@ export const getTransitionAttr = (
 /**
  * 新增class
  */
-export const addClass = (el: HTMLElement, c: string) => {
+export const addClass = (el: HTMLElement, c: string): void => {
     const classNameList = el.getAttribute("class")?.split(" ");
     if (classNameList) {
         if (!classNameList.includes(c)) {
@@ -59,7 +63,7 @@ export const addClass = (el: HTMLElement, c: string) => {
  * 移出class
  */
 
-export const removeClass = (el: HTMLElement, c: string) => {
+export const removeClass = (el: HTMLElement, c: string): void => {
     const classNameList = el.getAttribute("class")?.split(" ");
     const n = classNameList?.findIndex((item) => item === c);
     if (typeof n === "number" && n >= 0) {
@@ -72,7 +76,16 @@ export const removeClass = (el: HTMLElement, c: string) => {
     }
 };
 
-export const getMatrixAttr = (el: HTMLElement) => {
+export const getMatrixAttr = (
+    el: HTMLElement,
+): {
+    scaleX: string;
+    skewY: string;
+    skewX: string;
+    scaleY: string;
+    translateX: string;
+    translateY: string;
+} | null => {
     const attr = window.getComputedStyle(el, null).transform;
 
     if (attr.includes("matrix")) {
@@ -88,4 +101,9 @@ export const getMatrixAttr = (el: HTMLElement) => {
     } else {
         return null;
     }
+};
+
+export const deepCloneData = <T>(data: T): T => {
+    const d = data ? JSON.parse(JSON.stringify(data)) : undefined;
+    return d as T;
 };
