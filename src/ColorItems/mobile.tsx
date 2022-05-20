@@ -1,34 +1,31 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import { ListItemProps } from "../storageCabinet";
-import { OptionProps } from "../unit";
+import { useListenPosition } from "../useListenPosition";
 import { useMContext } from "../context";
 import { Item } from "../item";
 import { DeskProps } from "./desk";
+import { ListItemProps } from "../storageCabinet";
+import { OptionProps } from "../unit";
 
-export const Mobile: React.FC<DeskProps> = ({
-    colors,
-    handleChange,
-    value,
-    handleColorChange,
-}) => {
+export const Mobile: React.FC<DeskProps> = ({ colors, handleChange, value, handleColorChange }) => {
     const listRef = useRef([...colors]);
 
     const { mouseUpOnStorage } = useMContext();
 
+    const ref = useRef<HTMLDivElement | null>(null);
 
     const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
-
         const data = mouseUpOnStorage.current;
+        handleChange(undefined);
+        if (n === data?.index) {
+            return;
+        }
 
-        if (n === data?.index) { return }
-
-        const index = item.values.findIndex(val => val.code === res?.code);
+        const index = item.values.findIndex((val) => val.code === res?.code);
         if (index >= 0) {
-            item.values.splice(index, 1)
+            item.values.splice(index, 1);
         }
 
         handleColorChange([...listRef.current]);
-        handleChange(undefined)
     };
 
     useLayoutEffect(() => {
@@ -41,9 +38,7 @@ export const Mobile: React.FC<DeskProps> = ({
      */
     useEffect(() => {
         const fn = () => {
-            if (
-                mouseUpOnStorage.current
-            ) {
+            if (mouseUpOnStorage.current) {
                 const data = mouseUpOnStorage.current;
                 const n = data.index;
                 const values = listRef.current[n].values;
@@ -68,19 +63,15 @@ export const Mobile: React.FC<DeskProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mouseUpOnStorage]);
 
+    useListenPosition(ref);
+
     return (
         <div className="mobile_colorWrap">
-            <div className="mobile_colorContainer">
+            <div className="mobile_colorContainer" ref={ref}>
                 {colors.map((item, n) => {
                     return (
-                        <div
-                            className="storageCabinet_item"
-                            key={item.code}
-                            data-i={n}
-                        >
-                            <div className="storageCabinet_itemTitle">
-                                {item.content}
-                            </div>
+                        <div className="storageCabinet_item" key={item.code} data-i={n}>
+                            <div className="storageCabinet_itemTitle">{item.content}</div>
                             <div className="storageCabinet_itemValues">
                                 <Item
                                     values={item.values}

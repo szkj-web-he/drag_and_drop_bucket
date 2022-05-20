@@ -2,21 +2,11 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ListItemProps } from "../storageCabinet";
 import { useMContext } from "../context";
 import { Item } from "../item";
-import {
-    addClass,
-    getMatrixAttr,
-    getTransitionAttr,
-    OptionProps,
-    removeClass,
-} from "../unit";
+import { addClass, getMatrixAttr, getTransitionAttr, OptionProps, removeClass } from "../unit";
 import { DeskProps } from "./desk";
+import { useListenPosition } from "../useListenPosition";
 
-export const Tablet: React.FC<DeskProps> = ({
-    colors,
-    handleChange,
-    value,
-    handleColorChange,
-}) => {
+export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handleColorChange }) => {
     const listRef = useRef([...colors]);
 
     const { mouseUpOnStorage } = useMContext();
@@ -52,9 +42,17 @@ export const Tablet: React.FC<DeskProps> = ({
         startX: 0,
     });
 
+    const colorFn = useRef(handleColorChange);
+
     useLayoutEffect(() => {
         listRef.current = [...colors];
     }, [colors]);
+
+    useLayoutEffect(() => {
+        colorFn.current = handleColorChange;
+    }, [handleColorChange]);
+
+    useListenPosition(ref, "tablet");
 
     /**
      * touch 事件的穿透处理
@@ -63,14 +61,12 @@ export const Tablet: React.FC<DeskProps> = ({
      */
     useEffect(() => {
         const fn = () => {
-            if (
-                mouseUpOnStorage.current
-            ) {
+            if (mouseUpOnStorage.current) {
                 const data = mouseUpOnStorage.current;
                 const n = data.index;
-                const values = listRef.current[n].values;
-                const val = data.val;
-                const status = values.some((item) => item === val);
+                const { values } = listRef.current[n];
+                const { val } = data;
+                const status = values.some((item) => item.code === val.code);
 
                 if (!status) {
                     values.push(val);
@@ -79,7 +75,7 @@ export const Tablet: React.FC<DeskProps> = ({
                 arr[n].values = [...values];
                 listRef.current = [...arr];
 
-                handleColorChange([...listRef.current]);
+                colorFn.current([...listRef.current]);
             }
         };
         document.addEventListener("touchend", fn);
@@ -87,7 +83,6 @@ export const Tablet: React.FC<DeskProps> = ({
         return () => {
             document.removeEventListener("touchend", fn);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mouseUpOnStorage]);
 
     useEffect(() => {
@@ -100,14 +95,15 @@ export const Tablet: React.FC<DeskProps> = ({
         const fn = () => {
             const el = ref.current;
             if (!el) return;
-            el.style.transform = `translateX(${(currentPage ? -currentPage : currentPage) * el.offsetWidth
-                }px)`;
+            el.style.transform = `translateX(${
+                (currentPage ? -currentPage : currentPage) * el.offsetWidth
+            }px)`;
         };
         window.addEventListener("resize", fn);
         return () => {
-            window.removeEventListener('resize', fn)
-        }
-    }, [currentPage])
+            window.removeEventListener("resize", fn);
+        };
+    }, [currentPage]);
 
     /**
      * 滑块功能 start
@@ -176,8 +172,7 @@ export const Tablet: React.FC<DeskProps> = ({
         } else if (value > total) {
             value = total;
         }
-        el.style.transform = `translateX(${(value ? -value : value) * el.offsetWidth
-            }px)`;
+        el.style.transform = `translateX(${(value ? -value : value) * el.offsetWidth}px)`;
         setCurrentPage(value);
         addClassName("transition");
     };
@@ -188,23 +183,18 @@ export const Tablet: React.FC<DeskProps> = ({
         const el = ref.current;
         if (!el) return;
 
-        if (
-            Math.abs(e.changedTouches[0].pageX - touchData.current.startX) >
-            el.offsetWidth / 3
-        ) {
+        if (Math.abs(e.changedTouches[0].pageX - touchData.current.startX) > el.offsetWidth / 3) {
             executionGestures();
         } else {
-            const arr = tracks.current?.slice(
-                tracks.current.length - 3,
-                tracks.current.length
-            );
+            const arr = tracks.current?.slice(tracks.current.length - 3, tracks.current.length);
             const v = (arr?.reduce((a, b) => a + b) || 0) / (arr?.length || 0);
 
             if (Math.abs(v) > 0.5 && v !== 0) {
                 executionGestures();
             } else {
-                el.style.transform = `translateX(${(currentPage ? -currentPage : currentPage) * el.offsetWidth
-                    }px)`;
+                el.style.transform = `translateX(${
+                    (currentPage ? -currentPage : currentPage) * el.offsetWidth
+                }px)`;
                 addClassName("transition");
             }
         }
@@ -244,8 +234,7 @@ export const Tablet: React.FC<DeskProps> = ({
 
         if (
             typeof touchData.current.y === "number" &&
-            Math.abs(y - touchData.current.y) >
-            Math.abs(x - touchData.current.x)
+            Math.abs(y - touchData.current.y) > Math.abs(x - touchData.current.x)
         ) {
             handleTouchCancel();
 
@@ -257,7 +246,7 @@ export const Tablet: React.FC<DeskProps> = ({
          */
         if (touchData.current.status === null) {
             const attr = getMatrixAttr(el);
-            const val = (Number(attr?.translateX) || 0);
+            const val = Number(attr?.translateX) || 0;
             touchData.current.val = val;
             removeClass(el, "transition");
         }
@@ -320,10 +309,7 @@ export const Tablet: React.FC<DeskProps> = ({
             ...getTransitionAttr(el),
         };
         el.addEventListener("transitionend", handleTransitionEnd);
-        timeOut.current = window.setTimeout(
-            transitionendFn,
-            transitionData.current.timeout + 1
-        );
+        timeOut.current = window.setTimeout(transitionendFn, transitionData.current.timeout + 1);
     };
     /**
      *
@@ -374,9 +360,7 @@ export const Tablet: React.FC<DeskProps> = ({
      * list的预处理
      * 每6个一组
      */
-    const colorList: Array<
-        Array<ListItemProps>
-    > = [];
+    const colorList: Array<Array<ListItemProps>> = [];
 
     let start = -1;
     colors.map((item, n) => {
@@ -391,26 +375,23 @@ export const Tablet: React.FC<DeskProps> = ({
     });
 
     const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
-
         const data = mouseUpOnStorage.current;
+        handleChange(undefined);
 
-        if (n === data?.index) { return }
-
-        const index = item.values.findIndex(val => val.code === res?.code);
+        if (n === data?.index) {
+            return;
+        }
+        const index = item.values.findIndex((val) => val.code === res?.code);
         if (index >= 0) {
-            item.values.splice(index, 1)
+            item.values.splice(index, 1);
         }
 
         handleColorChange([...listRef.current]);
-        handleChange(undefined)
     };
 
     return (
         <div className="tablet_colorWrap">
-            <div
-                className="tablet_colorContainer"
-                onTouchStart={handleTouchStart}
-            >
+            <div className="tablet_colorContainer" onTouchStart={handleTouchStart}>
                 <div className="tablet_colorContent" ref={ref}>
                     {colorList.map((colorArr, n) => {
                         return (
@@ -429,7 +410,9 @@ export const Tablet: React.FC<DeskProps> = ({
                                                 <Item
                                                     values={item.values}
                                                     handleChange={handleChange}
-                                                    onUp={(res) => handleUp(item, n * 6 + index, res)}
+                                                    onUp={(res) =>
+                                                        handleUp(item, n * 6 + index, res)
+                                                    }
                                                     index={n * 6 + index}
                                                     value={value}
                                                 />
@@ -447,8 +430,7 @@ export const Tablet: React.FC<DeskProps> = ({
                     {colorList.map((_, n) => {
                         return (
                             <span
-                                className={`tablet_pageItem${currentPage === n ? " active" : ""
-                                    }`}
+                                className={`tablet_pageItem${currentPage === n ? " active" : ""}`}
                                 key={`page${n}`}
                                 onTouchStart={(e) => e.stopPropagation()}
                                 onClick={() => {

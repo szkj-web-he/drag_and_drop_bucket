@@ -1,9 +1,10 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useMContext } from "../context";
 import { Item } from "../item";
 import { ScrollComponent } from "../Scroll";
 import { Icon } from "../icon";
 import { DeskProps } from "./desk";
+import { useListenPosition } from "../useListenPosition";
 import { ListItemProps } from "../storageCabinet";
 import { OptionProps } from "../unit";
 
@@ -15,17 +16,20 @@ export const SmallDesk: React.FC<DeskProps> = ({
 }) => {
     const listRef = useRef([...colors]);
 
-    const { mouseUpOnStorage, position } = useMContext();
+    const { mouseUpOnStorage } = useMContext();
 
     const ref = useRef<HTMLDivElement | null>(null);
 
     const scrollEl = useRef<HTMLDivElement | null>(null);
+
     /**
      * 0 起点
      * 1 终点
      * 2 在起点或终点之间
      */
     const [scrollStatus, setScrollStatus] = useState<0 | 1 | 2>(0);
+
+    useListenPosition(ref);
 
     useLayoutEffect(() => {
         listRef.current = [...colors];
@@ -35,7 +39,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
         const el = scrollEl.current;
         if (!el) return;
         let node: null | Element = null;
-        for (let i = 0; i < el.children.length;) {
+        for (let i = 0; i < el.children.length; ) {
             const item = el.children[i];
             if (
                 item
@@ -72,44 +76,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
         });
     };
 
-    useEffect(() => {
-        const fn = () => {
-            const el = ref.current;
-            if (!el) return;
-
-            const childList = el.children;
-
-            const els = position
-                ? document.elementsFromPoint(position.x, position.y)
-                : [];
-
-            for (let i = 0; i < childList.length; i++) {
-                const child = childList[i];
-                const status = els.some((item) => item === child);
-                const classList = child.getAttribute("class")?.split(" ") || [];
-                const n = classList?.findIndex((item) => item === "active");
-                if (status) {
-                    if (n === undefined || n < 0) {
-                        classList.push("active");
-                        child.setAttribute("class", classList.join(" "));
-                    }
-                } else if (typeof n === "number" && n > 0) {
-                    classList.splice(n, 1);
-                    child.setAttribute("class", classList.join(" "));
-                }
-            }
-        };
-
-        const timer = window.setTimeout(fn);
-        return () => {
-            window.clearTimeout(timer);
-        };
-    }, [position]);
-
-    const handleMouseUp = (
-        { values }: ListItemProps,
-        n: number
-    ) => {
+    const handleMouseUp = ({ values }: ListItemProps, n: number) => {
         if (!value) return;
         const status = values.some((val) => val.code === value.code);
         if (!status) {
@@ -151,33 +118,31 @@ export const SmallDesk: React.FC<DeskProps> = ({
     };
 
     const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
-
         const data = mouseUpOnStorage.current;
+        handleChange(undefined);
+        if (n === data?.index) {
+            return;
+        }
 
-        if (n === data?.index) { return }
-
-        const index = item.values.findIndex(val => val.code === res?.code);
+        const index = item.values.findIndex((val) => val.code === res?.code);
         if (index >= 0) {
-            item.values.splice(index, 1)
+            item.values.splice(index, 1);
         }
 
         handleColorChange([...listRef.current]);
-        handleChange(undefined)
     };
 
     return (
         <>
             <div className="arrowContainer">
                 <div
-                    className={`arrowContainer_pre${scrollStatus === 0 ? " gray" : ""
-                        }`}
+                    className={`arrowContainer_pre${scrollStatus === 0 ? " gray" : ""}`}
                     onClick={toLeft}
                 >
                     <Icon className="arrowContainer_icon" />
                 </div>
                 <div
-                    className={`arrowContainer_next${scrollStatus === 1 ? " gray" : ""
-                        }`}
+                    className={`arrowContainer_next${scrollStatus === 1 ? " gray" : ""}`}
                     onClick={toRight}
                 >
                     <Icon className="arrowContainer_icon" />
@@ -199,9 +164,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
                                 data-i={n}
                                 onMouseUp={() => handleMouseUp(item, n)}
                             >
-                                <div className="storageCabinet_itemTitle">
-                                    {item.content}
-                                </div>
+                                <div className="storageCabinet_itemTitle">{item.content}</div>
                                 <div className="storageCabinet_itemValues">
                                     <Item
                                         values={item.values}

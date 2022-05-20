@@ -1,16 +1,11 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useEffect, useState } from "react";
-import { updateStateListener } from "./boilerplate";
 import { useMContext } from "./context";
-import { ConfigYML } from "@possie-engine/dr-plugin-sdk/config/yml";
-import { PluginComms } from "@possie-engine/dr-plugin-sdk/pluginComms";
+import { comms } from ".";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
-const comms = new PluginComms({ defaultConfig: new ConfigYML() });
-
-const options = comms.getConfigNode('options')[0] as Array<OptionProps>;
 
 // const colors = options.map(item => { const key = Object.keys(item)[0]; return item[key] });
 
@@ -19,7 +14,7 @@ import { Desk } from "./ColorItems/desk";
 import { SmallDesk } from "./ColorItems/smallDesk";
 import { Tablet } from "./ColorItems/tablet";
 import { Mobile } from "./ColorItems/mobile";
-import { deepCloneData, DragData, OptionProps } from "./unit";
+import { ConfigProps, deepCloneData, DragData, OptionProps } from "./unit";
 export interface StorageCabinetProps {
     handleChange: (res: DragData | undefined) => void;
     value?: DragData;
@@ -32,32 +27,22 @@ export interface ListItemProps {
 }
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-export const StorageCabinet: React.FC<StorageCabinetProps> = ({
-    handleChange,
-    value,
-}) => {
+export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, value }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
     const { isMobile } = useMContext();
 
-    const [is1024, setIs1024] = useState(
-        window.matchMedia("(max-width: 1000px)").matches
-    );
+    const [is1024, setIs1024] = useState(window.matchMedia("(max-width: 1000px)").matches);
 
-    const [is375, setIs375] = useState(
-        window.matchMedia("(max-width: 703px)").matches
-    );
+    const [is375, setIs375] = useState(window.matchMedia("(max-width: 703px)").matches);
 
-    const [list, setList] = useState<
-        Array<ListItemProps>
-    >(
-        deepCloneData(options)
-            .map((item) => ({
-                code: item.code,
-                content: item.content,
-                values: [],
-            }))
+    const [list, setList] = useState<Array<ListItemProps>>(
+        deepCloneData((comms as unknown as ConfigProps).config.options[0]).map((item) => ({
+            code: item.code,
+            content: item.content,
+            values: [],
+        })),
     );
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
@@ -79,15 +64,13 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
-    const handleColorChange = (
-        res: ListItemProps[]
-    ) => {
+    const handleColorChange = (res: ListItemProps[]) => {
         setList([...res]);
         const data: Record<string, string> = {};
         for (let i = 0; i < res.length; i++) {
-            data[res[i].code] = JSON.stringify(res[i].values.map(item => item.code))
+            data[res[i].code] = JSON.stringify(res[i].values.map((item) => item.code));
         }
-        updateStateListener(data);
+        comms.state = data;
     };
 
     let classStr = "storageCabinet_wrap";
