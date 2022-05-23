@@ -121,6 +121,7 @@ export interface PointProps {
 
 export interface ConfigProps {
     config: {
+        question: string;
         options: Array<
             Array<{
                 code: string;

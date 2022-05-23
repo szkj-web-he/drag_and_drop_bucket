@@ -1,26 +1,25 @@
 # The question text can be modified by the survey owner.
-question: "Your question here. (From config)"
+question: "Q1. 请对以下水果进行分类。（一个框可放一个或多个，至少放一个）"
 # The instructions to the question can be modified by the survey owner. It's recommended that the existing instructions are included in the customised instructions.
 instruction: "Your instruction here. (From config)"
 # For the purposes of reproducing a bug
-options:
-    [
+options: [
         [
             { "code": "a", "content": "wath tv" },
             { "code": "b", "content": "玩游戏" },
-            { "code": "c", "content": "睡觉" },
-            { "code": "d", "content": "看书" },
-            { "code": "e", "content": "玩手机" },
-            { "code": "f", "content": "听歌" },
-            { "code": "g", "content": "洗衣服" },
-            { "code": "h", "content": "扫地" },
-            { "code": "i", "content": "做饭" },
-            { "code": "j", "content": "跑步" },
+            # { "code": "c", "content": "睡觉" },
+            # { "code": "d", "content": "看书" },
+            # { "code": "e", "content": "玩手机" },
+            # { "code": "f", "content": "听歌" },
+            # { "code": "g", "content": "洗衣服" },
+            # { "code": "h", "content": "扫地" },
+            # { "code": "i", "content": "做饭" },
+            # { "code": "j", "content": "跑步" },
         ],
         [
             {
                 "code": "1",
-                "content": "adafasdflkasjdlkfjaslkdfjalksdjflaksjdflkajsdlkfjasdlkfjasdkjfasdjfal;dkjsf;lakjsdflkjasdfjkalksdfjlasdjflakjsdf",
+                "content": "<div><b><i><strike>fsdfadsfsdf</strike></i></b></div><div><b><i><strike>ddddddddd</strike></i></b></div>",
             },
             { "code": "2", "content": "吃香蕉" },
             { "code": "3", "content": "吃羊肉" },
