@@ -12,7 +12,9 @@ export const useListenPosition = (
             const rEl = ref.current;
             if (!rEl) return;
 
-            const els = position ? document.elementsFromPoint(position.pageX, position.pageY) : [];
+            const els = position
+                ? document.elementsFromPoint(position.clientX, position.clientY)
+                : [];
 
             const findChild = (el: HTMLElement) => {
                 const childList = el.children;

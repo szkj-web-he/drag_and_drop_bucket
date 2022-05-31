@@ -45,13 +45,21 @@ const Main: React.FC = () => {
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <div className="wrapper">
-            <div
-                className="top"
-                dangerouslySetInnerHTML={{
-                    __html: (comms as unknown as ConfigProps).config.question ?? "",
-                }}
-            />
+        <div className={`wrapper${mobileStatus ? ` mobile` : ""}`}>
+            <div className="question">
+                <div
+                    className="questionContent"
+                    dangerouslySetInnerHTML={{
+                        __html: (comms as unknown as ConfigProps).config.question ?? "",
+                    }}
+                />
+                <div
+                    className="questionDes"
+                    dangerouslySetInnerHTML={{
+                        __html: `(${(comms as unknown as ConfigProps).config.instruction ?? ""})`,
+                    }}
+                />
+            </div>
             <Context.Provider
                 value={{
                     mouseUpOnStorage: status,

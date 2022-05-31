@@ -42,6 +42,8 @@ export const Product: React.FC<ProductProps> = ({
     const point = useRef<PointProps>({
         pageX: 0,
         pageY: 0,
+        clientX: 0,
+        clientY: 0,
         x: 0,
         y: 0,
         width: 0,
@@ -67,13 +69,20 @@ export const Product: React.FC<ProductProps> = ({
         if (!valRef.current) return;
         let x = 0;
         let y = 0;
+        let clientX = 0;
+        let clientY = 0;
+
         if (e instanceof MouseEvent) {
             x = e.pageX;
             y = e.pageY;
+            clientX = e.clientX;
+            clientY = e.clientY;
         } else {
             const position = e.changedTouches[0];
             x = position.pageX;
             y = position.pageY;
+            clientX = position.clientX;
+            clientY = position.clientY;
         }
         const moveX = x - point.current.pageX;
         const moveY = y - point.current.pageY;
@@ -82,6 +91,8 @@ export const Product: React.FC<ProductProps> = ({
         point.current.y = moveY + point.current.y;
         point.current.pageX = x;
         point.current.pageY = y;
+        point.current.clientX = clientX;
+        point.current.clientY = clientY;
 
         setPosition({
             ...point.current,
@@ -98,6 +109,8 @@ export const Product: React.FC<ProductProps> = ({
             pageY: 0,
             width: 0,
             height: 0,
+            clientX: 0,
+            clientY: 0,
         };
 
         setPosition(undefined);
@@ -117,9 +130,7 @@ export const Product: React.FC<ProductProps> = ({
 
         const position = e.changedTouches[0];
 
-        const x = position.pageX;
-        const y = position.pageY;
-        const els = document.elementsFromPoint(x, y);
+        const els = document.elementsFromPoint(position.clientX, position.clientY);
 
         for (let i = 0; i < els.length; ) {
             const el = els[i];
@@ -152,6 +163,8 @@ export const Product: React.FC<ProductProps> = ({
         position: {
             x: number;
             y: number;
+            clientX: number;
+            clientY: number;
         },
     ) => {
         handleChange({
@@ -167,6 +180,8 @@ export const Product: React.FC<ProductProps> = ({
         const rectY = rect.top + scrollData.y;
 
         point.current = {
+            clientX: position.clientX,
+            clientY: position.clientY,
             pageX: position.x,
             pageY: position.y,
             x: rectX,
@@ -189,6 +204,8 @@ export const Product: React.FC<ProductProps> = ({
         handleDown(item, e, {
             x: e.pageX,
             y: e.pageY,
+            clientX: e.clientX,
+            clientY: e.clientY,
         });
         document.addEventListener("mousemove", handleMove);
         document.addEventListener("mouseup", handleMouseUp);
@@ -201,6 +218,8 @@ export const Product: React.FC<ProductProps> = ({
         handleDown(item, e, {
             x: position.pageX,
             y: position.pageY,
+            clientX: position.clientX,
+            clientY: position.clientY,
         });
     };
 

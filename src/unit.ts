@@ -113,6 +113,8 @@ export type HandleChangeFn = (res: DragData | undefined) => void;
 export interface PointProps {
     pageX: number;
     pageY: number;
+    clientX: number;
+    clientY: number;
     x: number;
     y: number;
     width: number;
@@ -121,7 +123,8 @@ export interface PointProps {
 
 export interface ConfigProps {
     config: {
-        question: string;
+        question?: string;
+        instruction?: string;
         options: Array<
             Array<{
                 code: string;

@@ -117,6 +117,8 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
         classStr += is375 ? " mobile" : " tablet";
     } else if (is1024) {
         classStr += " small_desk";
+    } else {
+        classStr += " desk";
     }
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
