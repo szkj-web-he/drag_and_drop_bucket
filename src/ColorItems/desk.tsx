@@ -23,7 +23,7 @@ export const Desk: React.FC<DeskProps> = ({ colors, handleChange, value, handleC
 
     useListenPosition(ref);
 
-    const handleMouseUp = ({ values }: ListItemProps, n) => {
+    const handleMouseUp = ({ values }: ListItemProps, n: number) => {
         if (!value) return;
 
         const status = values.some((val) => val.code === value.code);
