@@ -3,7 +3,7 @@
 
 import React from "react";
 import { Product } from "./product";
-import { ConfigProps, deepCloneData, DragData, HandleChangeFn } from "./unit";
+import { deepCloneData, DragData, HandleChangeFn } from "./unit";
 import { comms } from ".";
 import { useMContext } from "./context";
 import { ScrollComponent } from "./Scroll";
@@ -22,7 +22,7 @@ export interface WarehouseProps {
 export const Warehouse: React.FC<WarehouseProps> = ({ handleChange, value }) => {
     const { isMobile } = useMContext();
 
-    const params = (comms as unknown as ConfigProps).config.options[1];
+    const params = comms.config.options?.[1] ?? [];
 
     const handleUp = () => {
         handleChange(undefined);

@@ -6,15 +6,21 @@ import React, { useEffect, useRef, useState } from "react";
 import { StorageCabinet } from "./storageCabinet";
 import { Context } from "./context";
 import { isMobile } from "./isMobile";
-import { ConfigProps, deepCloneData, DragData, OptionProps, PointProps } from "./unit";
+import { deepCloneData, DragData, OptionProps, PointProps } from "./unit";
 
-import { ConfigYML } from "@possie-engine/dr-plugin-sdk/config/yml";
-import { PluginComms } from "@possie-engine/dr-plugin-sdk/pluginComms";
+import { PluginComms, ConfigYML } from "@possie-engine/dr-plugin-sdk";
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
-});
-
+}) as {
+    config: {
+        question?: string;
+        instruction?: string;
+        options?: Array<Array<{ code: string; content: string }>>;
+    };
+    state: unknown;
+    renderOnReady: (res: React.ReactNode) => void;
+};
 const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
@@ -50,13 +56,13 @@ const Main: React.FC = () => {
                 <div
                     className="questionContent"
                     dangerouslySetInnerHTML={{
-                        __html: (comms as unknown as ConfigProps).config.question ?? "",
+                        __html: comms.config.question ?? "",
                     }}
                 />
                 <div
                     className="questionDes"
                     dangerouslySetInnerHTML={{
-                        __html: `(${(comms as unknown as ConfigProps).config.instruction ?? ""})`,
+                        __html: `(${comms.config.instruction ?? ""})`,
                     }}
                 />
             </div>

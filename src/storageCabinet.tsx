@@ -14,7 +14,7 @@ import { Desk } from "./ColorItems/desk";
 import { SmallDesk } from "./ColorItems/smallDesk";
 import { Tablet } from "./ColorItems/tablet";
 import { Mobile } from "./ColorItems/mobile";
-import { ConfigProps, deepCloneData, DragData, OptionProps } from "./unit";
+import { deepCloneData, DragData, OptionProps } from "./unit";
 export interface StorageCabinetProps {
     handleChange: (res: DragData | undefined) => void;
     value?: DragData;
@@ -38,7 +38,7 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
     const [is375, setIs375] = useState(window.matchMedia("(max-width: 703px)").matches);
 
     const [list, setList] = useState<Array<ListItemProps>>(
-        deepCloneData((comms as unknown as ConfigProps).config.options[0]).map((item) => ({
+        deepCloneData(comms.config.options?.[0] ?? []).map((item) => ({
             code: item.code,
             content: item.content,
             values: [],

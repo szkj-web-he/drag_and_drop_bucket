@@ -26,6 +26,8 @@ export const Desk: React.FC<DeskProps> = ({ colors, handleChange, value, handleC
 
     const timer = useRef<number>();
 
+    const enterInScrollTime = useRef<number>();
+
     useLayoutEffect(() => {
         listRef.current = [...colors];
     }, [colors]);
@@ -42,7 +44,7 @@ export const Desk: React.FC<DeskProps> = ({ colors, handleChange, value, handleC
 
     useEffect(() => {
         () => {
-            timer.current && window.clearTimeout();
+            timer.current && window.clearTimeout(timer.current);
         };
     }, []);
 
@@ -118,6 +120,8 @@ export const Desk: React.FC<DeskProps> = ({ colors, handleChange, value, handleC
         if (!value) {
             return;
         }
+        enterInScrollTime.current = Date.now();
+
         const scrollWrap = e.currentTarget;
         let scrollBody: HTMLElement | null = null;
         for (let i = 0; i < scrollWrap.children.length; ) {
@@ -155,7 +159,7 @@ export const Desk: React.FC<DeskProps> = ({ colors, handleChange, value, handleC
 
     const startScroll = (status: 1 | -1) => {
         const el = scrollBodyRef.current;
-        timer.current && window.clearTimeout();
+        timer.current && window.clearTimeout(timer.current);
         if (!el) {
             return;
         }
@@ -190,21 +194,31 @@ export const Desk: React.FC<DeskProps> = ({ colors, handleChange, value, handleC
      * 上
      */
     const handleMouseEnterOnTop = () => {
-        timer.current && window.clearTimeout();
-        timer.current = window.setTimeout(() => startScroll(-1));
+        timer.current && window.clearTimeout(timer.current);
+        let delay = 1;
+        if (enterInScrollTime.current && Date.now() - enterInScrollTime.current <= 201) {
+            delay = 200;
+        }
+
+        timer.current = window.setTimeout(() => startScroll(-1), delay);
     };
 
     const handleMouseLeaveOnTop = () => {
-        timer.current && window.clearTimeout();
+        timer.current && window.clearTimeout(timer.current);
     };
 
     const handleMouseEnterOnBottom = () => {
-        timer.current && window.clearTimeout();
-        timer.current = window.setTimeout(() => startScroll(1));
+        timer.current && window.clearTimeout(timer.current);
+        let delay = 1;
+        if (enterInScrollTime.current && Date.now() - enterInScrollTime.current <= 201) {
+            delay = 200;
+        }
+
+        timer.current = window.setTimeout(() => startScroll(1), delay);
     };
 
     const handleMouseLeaveOnBottom = () => {
-        timer.current && window.clearTimeout();
+        timer.current && window.clearTimeout(timer.current);
     };
 
     return (
