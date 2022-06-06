@@ -1,15 +1,13 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ListItemProps } from "../storageCabinet";
-import { useMContext } from "../context";
 import { Item } from "../item";
-import { addClass, getMatrixAttr, getTransitionAttr, OptionProps, removeClass } from "../unit";
+import { addClass, getMatrixAttr, getTransitionAttr, removeClass } from "../unit";
 import { DeskProps } from "./desk";
-import { useListenPosition } from "../useListenPosition";
+import bg from "../Assets/svg/bg_product.svg";
+import bg1 from "../Assets/svg/bg_product1.svg";
 
-export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handleColorChange }) => {
+export const Tablet: React.FC<DeskProps> = ({ colors, activeIndex }) => {
     const listRef = useRef([...colors]);
-
-    const { mouseUpOnStorage } = useMContext();
 
     const [currentPage, setCurrentPage] = useState(0);
 
@@ -42,48 +40,9 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
         startX: 0,
     });
 
-    const colorFn = useRef(handleColorChange);
-
     useLayoutEffect(() => {
         listRef.current = [...colors];
     }, [colors]);
-
-    useLayoutEffect(() => {
-        colorFn.current = handleColorChange;
-    }, [handleColorChange]);
-
-    useListenPosition(ref, "tablet");
-
-    /**
-     * touch 事件的穿透处理
-     * 本无穿透
-     * 做穿透处理
-     */
-    useEffect(() => {
-        const fn = () => {
-            if (mouseUpOnStorage.current) {
-                const data = mouseUpOnStorage.current;
-                const n = data.index;
-                const { values } = listRef.current[n];
-                const { val } = data;
-                const status = values.some((item) => item.code === val.code);
-
-                if (!status) {
-                    values.push(val);
-                }
-                const arr = [...listRef.current];
-                arr[n].values = [...values];
-                listRef.current = [...arr];
-
-                colorFn.current([...listRef.current]);
-            }
-        };
-        document.addEventListener("touchend", fn);
-
-        return () => {
-            document.removeEventListener("touchend", fn);
-        };
-    }, [mouseUpOnStorage]);
 
     useEffect(() => {
         return () => {
@@ -374,21 +333,6 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
         }
     });
 
-    const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
-        const data = mouseUpOnStorage.current;
-        handleChange(undefined);
-
-        if (n === data?.index) {
-            return;
-        }
-        const index = item.values.findIndex((val) => val.code === res?.code);
-        if (index >= 0) {
-            item.values.splice(index, 1);
-        }
-
-        handleColorChange([...listRef.current]);
-    };
-
     return (
         <div className="tablet_colorWrap">
             <div className="tablet_colorContainer" onTouchStart={handleTouchStart}>
@@ -399,23 +343,34 @@ export const Tablet: React.FC<DeskProps> = ({ colors, handleChange, value, handl
                                 {colorArr.map((item, index) => {
                                     return (
                                         <li
-                                            className="storageCabinet_item"
+                                            className={`storageCabinet_item${
+                                                activeIndex === n * 6 + index ? " active" : ""
+                                            }`}
                                             key={item.code}
                                             data-i={n * 6 + index}
                                         >
+                                            <div
+                                                className="storageCabinet_itemBg"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: bg,
+                                                }}
+                                            />
+
+                                            <div
+                                                className="storageCabinet_itemBg1"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: bg1,
+                                                }}
+                                            />
+                                            <div className="storageCabinet_itemBg2" />
+                                            <div className="storageCabinet_itemBg3" />
+                                            <div className="storageCabinet_itemBg4" />
+
                                             <div className="storageCabinet_itemTitle">
                                                 {item.content}
                                             </div>
                                             <div className="storageCabinet_itemValues">
-                                                <Item
-                                                    values={item.values}
-                                                    handleChange={handleChange}
-                                                    onUp={(res) =>
-                                                        handleUp(item, n * 6 + index, res)
-                                                    }
-                                                    index={n * 6 + index}
-                                                    value={value}
-                                                />
+                                                <Item values={item.values} index={n * 6 + index} />
                                             </div>
                                         </li>
                                     );

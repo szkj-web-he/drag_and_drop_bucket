@@ -1,41 +1,25 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useMContext } from "../context";
+import React, { useEffect, useRef, useState } from "react";
 import { Item } from "../item";
 import { ScrollComponent } from "../Scroll";
 import { Icon } from "../icon";
 import { DeskProps } from "./desk";
-import { useListenPosition } from "../useListenPosition";
-import { ListItemProps } from "../storageCabinet";
-import { OptionProps } from "../unit";
+import bg from "../Assets/svg/bg_product.svg";
+import bg1 from "../Assets/svg/bg_product1.svg";
 
-export const SmallDesk: React.FC<DeskProps> = ({
-    colors,
-    handleChange,
-    value,
-    handleColorChange,
-}) => {
-    const listRef = useRef([...colors]);
-
-    const { mouseUpOnStorage } = useMContext();
-
+export const SmallDesk: React.FC<DeskProps> = ({ colors, activeIndex }) => {
     const ref = useRef<HTMLDivElement | null>(null);
 
     const scrollEl = useRef<HTMLDivElement | null>(null);
 
     const [showBtn, setShowBtn] = useState(false);
 
+    const scrollTimer = useRef<number>();
     /**
      * 0 起点
      * 1 终点
      * 2 在起点或终点之间
      */
     const [scrollStatus, setScrollStatus] = useState<0 | 1 | 2>(0);
-
-    useListenPosition(ref);
-
-    useLayoutEffect(() => {
-        listRef.current = [...colors];
-    }, [colors]);
 
     useEffect(() => {
         const fn = () => {
@@ -49,6 +33,7 @@ export const SmallDesk: React.FC<DeskProps> = ({
         fn();
         return () => {
             window.removeEventListener("resize", fn);
+            scrollTimer.current && window.clearTimeout(scrollTimer.current);
         };
     }, []);
 
@@ -93,28 +78,11 @@ export const SmallDesk: React.FC<DeskProps> = ({
         });
     };
 
-    const handleMouseUp = ({ values }: ListItemProps, n: number) => {
-        if (!value) return;
-        const status = values.some((val) => val.code === value.code);
-        if (!status) {
-            values.push(value);
-        }
-
-        const arr = [...listRef.current];
-        arr[n].values = [...values];
-        listRef.current = [...arr];
-        handleColorChange([...listRef.current]);
-
-        mouseUpOnStorage.current = {
-            index: n,
-            val: value,
-        };
-    };
-
     const handleScroll = ({
         left,
         scrollWidth,
         clientWidth,
+        offsetWidth,
     }: {
         left: number;
         top: number;
@@ -125,28 +93,48 @@ export const SmallDesk: React.FC<DeskProps> = ({
         clientHeight: number;
         clientWidth: number;
     }) => {
-        if (Math.ceil(left + clientWidth) >= scrollWidth) {
-            setScrollStatus(1);
-        } else if (left <= 0) {
-            setScrollStatus(0);
-        } else {
-            setScrollStatus(2);
+        if (scrollTimer.current) {
+            window.clearTimeout(scrollTimer.current);
         }
-    };
+        scrollTimer.current = window.setTimeout(() => {
+            window.clearTimeout(scrollTimer.current);
+            scrollTimer.current = undefined;
 
-    const handleUp = (item: ListItemProps, n: number, res: OptionProps | undefined) => {
-        const data = mouseUpOnStorage.current;
-        handleChange(undefined);
-        if (n === data?.index) {
-            return;
-        }
+            const el = scrollEl.current;
+            if (!el) return;
+            const childrenList = el.children;
 
-        const index = item.values.findIndex((val) => val.code === res?.code);
-        if (index >= 0) {
-            item.values.splice(index, 1);
-        }
+            let scrollBody: null | HTMLElement = null;
+            for (let i = 0; i < childrenList.length; ) {
+                const childrenElement = childrenList[i];
+                const classAttr = childrenElement.getAttribute("class")?.split(" ");
+                if (classAttr?.includes("smallDesk_scrollBody")) {
+                    i = childrenList.length;
+                    if (childrenElement instanceof HTMLElement) {
+                        scrollBody = childrenElement;
+                    }
+                } else {
+                    ++i;
+                }
+            }
 
-        handleColorChange([...listRef.current]);
+            if (!scrollBody) return;
+
+            const rect = scrollBody.getBoundingClientRect();
+
+            left = Math.round(left);
+            if (
+                left + clientWidth >= scrollWidth ||
+                left + offsetWidth >= scrollWidth ||
+                Math.ceil(rect.width) + left >= scrollWidth
+            ) {
+                setScrollStatus(1);
+            } else if (left <= 0) {
+                setScrollStatus(0);
+            } else {
+                setScrollStatus(2);
+            }
+        });
     };
 
     return (
@@ -178,20 +166,32 @@ export const SmallDesk: React.FC<DeskProps> = ({
                     {colors.map((item, n) => {
                         return (
                             <div
-                                className="storageCabinet_item"
+                                className={`storageCabinet_item${
+                                    activeIndex === n ? " active" : ""
+                                }`}
                                 key={item.code}
                                 data-i={n}
-                                onMouseUp={() => handleMouseUp(item, n)}
                             >
+                                <div
+                                    className="storageCabinet_itemBg"
+                                    dangerouslySetInnerHTML={{
+                                        __html: bg,
+                                    }}
+                                />
+
+                                <div
+                                    className="storageCabinet_itemBg1"
+                                    dangerouslySetInnerHTML={{
+                                        __html: bg1,
+                                    }}
+                                />
+                                <div className="storageCabinet_itemBg2" />
+                                <div className="storageCabinet_itemBg3" />
+                                <div className="storageCabinet_itemBg4" />
+
                                 <div className="storageCabinet_itemTitle">{item.content}</div>
                                 <div className="storageCabinet_itemValues">
-                                    <Item
-                                        values={item.values}
-                                        handleChange={handleChange}
-                                        onUp={(res) => handleUp(item, n, res)}
-                                        index={n}
-                                        value={value}
-                                    />
+                                    <Item values={item.values} index={n} />
                                 </div>
                             </div>
                         );

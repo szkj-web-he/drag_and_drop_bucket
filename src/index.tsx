@@ -4,11 +4,14 @@ import "./style.scss";
 import { Warehouse } from "./warehouse";
 import React, { useEffect, useRef, useState } from "react";
 import { StorageCabinet } from "./storageCabinet";
-import { Context } from "./context";
+import { BasketUpFnProps, Context, MoveFnProps, ValueChangeFnProps } from "./context";
 import { isMobile } from "./isMobile";
-import { deepCloneData, DragData, OptionProps, PointProps } from "./unit";
 
 import { PluginComms, ConfigYML } from "@possie-engine/dr-plugin-sdk";
+import leftHr from "./Assets/svg/leftHr.svg";
+import rightHr from "./Assets/svg/rightHr.svg";
+import spider from "./Assets/svg/spider.svg";
+import pumpkin from "./Assets/svg/pumpkin.svg";
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
@@ -24,14 +27,26 @@ export const comms = new PluginComms({
 const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [selectItem, setSelectItem] = useState<DragData>();
-
-    const status = useRef<{ index: number; val: OptionProps }>();
 
     const [mobileStatus, setMobileStatus] = useState(isMobile);
 
-    const [position, setPosition] = useState<PointProps>();
+    const [position, setPosition] = useState<MoveFnProps>();
 
+    const [selectValue, setSelectValue] = useState<ValueChangeFnProps>();
+
+    const moveFn = useRef<(res?: MoveFnProps) => void>((res) => {
+        setPosition(res);
+    });
+
+    const valueChangeFn = useRef<(res?: ValueChangeFnProps) => void>((res) => setSelectValue(res));
+
+    const basketFn = useRef<{
+        move: (x: number, y: number) => undefined;
+        up: (res: BasketUpFnProps) => undefined;
+    }>({
+        move: () => undefined,
+        up: () => undefined,
+    });
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -68,37 +83,60 @@ const Main: React.FC = () => {
             </div>
             <Context.Provider
                 value={{
-                    mouseUpOnStorage: status,
                     isMobile: mobileStatus,
-                    position,
-                    setPosition,
+                    moveFn,
+                    valueChangeFn,
+                    basketFn,
                 }}
             >
-                <Warehouse
-                    handleChange={(res) => {
-                        setSelectItem(deepCloneData(res));
-                    }}
-                    value={deepCloneData(selectItem)}
-                />
-                <StorageCabinet
-                    handleChange={(res) => {
-                        setSelectItem(deepCloneData(res));
-                    }}
-                    value={deepCloneData(selectItem)}
-                />
-                {!!position && (
+                <Warehouse />
+                <div className="hr">
+                    <div
+                        className="hr_left"
+                        dangerouslySetInnerHTML={{
+                            __html: leftHr,
+                        }}
+                    />
+                    <div
+                        className="hr_right"
+                        dangerouslySetInnerHTML={{
+                            __html: rightHr,
+                        }}
+                    />
+                </div>
+                <StorageCabinet />
+                {!!selectValue && (
                     <div
                         className="floating"
                         style={{
-                            left: `${position.x}px`,
-                            top: `${position.y}px`,
-                            width: `${position.width}px`,
-                            height: `${position.height}px`,
+                            left: `${position?.x ?? 0}px`,
+                            top: `${position?.y ?? 0}px`,
+                            width: `${selectValue.width}px`,
+                            height: `${selectValue.height}px`,
                         }}
-                        dangerouslySetInnerHTML={{
-                            __html: selectItem?.content ?? "",
-                        }}
-                    />
+                    >
+                        <div className="itemBg1" />
+                        <div className="itemBg2" />
+                        <div className="itemBg3" />
+                        <div
+                            className="itemBg4"
+                            dangerouslySetInnerHTML={{
+                                __html: pumpkin,
+                            }}
+                        />
+                        <div
+                            className="itemBg5"
+                            dangerouslySetInnerHTML={{
+                                __html: spider,
+                            }}
+                        />
+                        <span
+                            className="itemContent"
+                            dangerouslySetInnerHTML={{
+                                __html: selectValue?.content ?? "",
+                            }}
+                        />
+                    </div>
                 )}
             </Context.Provider>
         </div>
