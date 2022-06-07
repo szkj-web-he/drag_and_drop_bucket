@@ -2,7 +2,7 @@ import "./font";
 import "./style.scss";
 
 import { Warehouse } from "./warehouse";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StorageCabinet } from "./storageCabinet";
 import { BasketUpFnProps, Context, MoveFnProps, ValueChangeFnProps } from "./context";
 import { isMobile } from "./isMobile";
@@ -34,11 +34,11 @@ const Main: React.FC = () => {
 
     const [selectValue, setSelectValue] = useState<ValueChangeFnProps>();
 
-    const moveFn = useRef<(res?: MoveFnProps) => void>((res) => {
-        setPosition(res);
-    });
+    // const moveFn = useRef<(res?: MoveFnProps) => void>((res) => {
+    //     setPosition(res);
+    // });
 
-    const valueChangeFn = useRef<(res?: ValueChangeFnProps) => void>((res) => setSelectValue(res));
+    // const valueChangeFn = useRef<(res?: ValueChangeFnProps) => void>((res) => setSelectValue(res));
 
     const basketFn = useRef<{
         move: (x: number, y: number) => undefined;
@@ -64,6 +64,14 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
+    const handleMoveCallback = useCallback((res?: MoveFnProps) => {
+        setPosition(res);
+    }, []);
+
+    const handleValueChangeCallback = useCallback((res?: ValueChangeFnProps) => {
+        setSelectValue(res);
+    }, []);
+
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className={`wrapper${mobileStatus ? ` mobile` : ""}`}>
@@ -84,8 +92,8 @@ const Main: React.FC = () => {
             <Context.Provider
                 value={{
                     isMobile: mobileStatus,
-                    moveFn,
-                    valueChangeFn,
+                    handleMoveCallback,
+                    handleValueChangeCallback,
                     basketFn,
                 }}
             >

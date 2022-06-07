@@ -21,7 +21,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const { isMobile, moveFn, valueChangeFn, basketFn } = useMContext();
+    const { isMobile, handleMoveCallback, handleValueChangeCallback, basketFn } = useMContext();
 
     const selectedFn = useRef<typeof document.onselectstart>(null);
 
@@ -62,7 +62,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             basketFn.current.move(position.clientX, position.clientY);
         }
 
-        moveFn.current({
+        handleMoveCallback({
             x: x - point.current.offsetX,
             y: y - point.current.offsetY,
         });
@@ -86,7 +86,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         });
 
         document.onselectstart = selectedFn.current;
-        valueChangeFn.current(undefined);
+        handleValueChangeCallback(undefined);
 
         selectValueRef.current = undefined;
         setSelectValue(undefined);
@@ -140,7 +140,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             ...selectValueRef.current,
         });
 
-        valueChangeFn.current({
+        handleValueChangeCallback({
             code: item.code,
             content: item.content,
             width: rect.width,
@@ -150,7 +150,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         const left = rect.left + scrollData.x;
         const top = rect.top + scrollData.y;
 
-        moveFn.current({
+        handleMoveCallback({
             x: left,
             y: top,
         });

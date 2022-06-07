@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Item } from "../item";
 import { ScrollComponent } from "../Scroll";
-import { Icon } from "../icon";
 import { DeskProps } from "./desk";
 import bg from "../Assets/svg/bg_product.svg";
 import bg1 from "../Assets/svg/bg_product1.svg";
+import Arrow from "../arrow";
+import ArrowBg from "../arrowBg";
 
 export const SmallDesk: React.FC<DeskProps> = ({ colors, activeIndex }) => {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -145,13 +146,35 @@ export const SmallDesk: React.FC<DeskProps> = ({ colors, activeIndex }) => {
                         className={`arrowContainer_pre${scrollStatus === 0 ? " gray" : ""}`}
                         onClick={toLeft}
                     >
-                        <Icon className="arrowContainer_icon" />
+                        <div className="arrowContainer_bg">
+                            <ArrowBg
+                                className="arrowContainer_bgIcon"
+                                lightColor={scrollStatus === 0 ? "#8B859A" : "#FFE39C"}
+                                patternColor={scrollStatus === 0 ? "#585065" : "#E89601"}
+                            />
+                        </div>
+                        <Arrow
+                            className="arrowContainer_icon"
+                            borderColor={scrollStatus === 0 ? "#453C5E" : "#974C08"}
+                            fillColor={scrollStatus === 0 ? "#B8B7BA" : "#FFF4D9"}
+                        />
                     </div>
                     <div
                         className={`arrowContainer_next${scrollStatus === 1 ? " gray" : ""}`}
                         onClick={toRight}
                     >
-                        <Icon className="arrowContainer_icon" />
+                        <div className="arrowContainer_bg">
+                            <ArrowBg
+                                className="arrowContainer_bgIcon"
+                                lightColor={scrollStatus === 1 ? "#8B859A" : "#FFE39C"}
+                                patternColor={scrollStatus === 1 ? "#585065" : "#E89601"}
+                            />
+                        </div>
+                        <Arrow
+                            className="arrowContainer_icon"
+                            borderColor={scrollStatus === 1 ? "#453C5E" : "#974C08"}
+                            fillColor={scrollStatus === 1 ? "#B8B7BA" : "#FFF4D9"}
+                        />
                     </div>
                 </div>
             )}

@@ -20,9 +20,8 @@ export interface BasketUpFnProps {
 
 interface ContextDataProps {
     isMobile: boolean;
-
-    moveFn: React.MutableRefObject<(res?: MoveFnProps) => void>;
-    valueChangeFn: React.MutableRefObject<(res?: ValueChangeFnProps) => void>;
+    handleMoveCallback: (res?: MoveFnProps) => void;
+    handleValueChangeCallback: (res?: ValueChangeFnProps) => void;
     basketFn: React.MutableRefObject<{
         move: (x: number, y: number) => void;
         up: (res: BasketUpFnProps) => void;
@@ -32,8 +31,8 @@ interface ContextDataProps {
 const contextData = (): ContextDataProps => ({
     isMobile: false,
 
-    moveFn: { current: () => undefined },
-    valueChangeFn: { current: () => undefined },
+    handleMoveCallback: () => undefined,
+    handleValueChangeCallback: () => undefined,
     basketFn: {
         current: {
             move: () => undefined,
