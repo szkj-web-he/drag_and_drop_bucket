@@ -2,16 +2,13 @@ import "./font";
 import "./style.scss";
 
 import { Warehouse } from "./warehouse";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StorageCabinet } from "./storageCabinet";
 import { BasketUpFnProps, Context, MoveFnProps, ValueChangeFnProps } from "./context";
 import { isMobile } from "./isMobile";
 
 import { PluginComms, ConfigYML } from "@possie-engine/dr-plugin-sdk";
-import leftHr from "./Assets/svg/leftHr.svg";
-import rightHr from "./Assets/svg/rightHr.svg";
-import spider from "./Assets/svg/spider.svg";
-import pumpkin from "./Assets/svg/pumpkin.svg";
+import hr from "./Assets/svg/hr.svg";
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
@@ -33,12 +30,6 @@ const Main: React.FC = () => {
     const [position, setPosition] = useState<MoveFnProps>();
 
     const [selectValue, setSelectValue] = useState<ValueChangeFnProps>();
-
-    const moveFn = useRef<(res?: MoveFnProps) => void>((res) => {
-        setPosition(res);
-    });
-
-    const valueChangeFn = useRef<(res?: ValueChangeFnProps) => void>((res) => setSelectValue(res));
 
     const basketFn = useRef<{
         move: (x: number, y: number) => undefined;
@@ -64,6 +55,12 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
+
+    const handleMoveCallback = useCallback((res?: MoveFnProps) => setPosition(res), []);
+
+    const handleValueChangeCallback = useCallback((res?: ValueChangeFnProps) => {
+        setSelectValue(res);
+    }, []);
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <div className={`wrapper${mobileStatus ? ` mobile` : ""}`}>
@@ -84,25 +81,21 @@ const Main: React.FC = () => {
             <Context.Provider
                 value={{
                     isMobile: mobileStatus,
-                    moveFn,
-                    valueChangeFn,
+                    handleMoveCallback,
+                    handleValueChangeCallback,
                     basketFn,
                 }}
             >
                 <Warehouse />
                 <div className="hr">
+                    <div className="hr_left" />
                     <div
-                        className="hr_left"
+                        className="hr_split"
                         dangerouslySetInnerHTML={{
-                            __html: leftHr,
+                            __html: hr,
                         }}
                     />
-                    <div
-                        className="hr_right"
-                        dangerouslySetInnerHTML={{
-                            __html: rightHr,
-                        }}
-                    />
+                    <div className="hr_right" />
                 </div>
                 <StorageCabinet />
                 {!!selectValue && (
@@ -114,29 +107,10 @@ const Main: React.FC = () => {
                             width: `${selectValue.width}px`,
                             height: `${selectValue.height}px`,
                         }}
-                    >
-                        <div className="itemBg1" />
-                        <div className="itemBg2" />
-                        <div className="itemBg3" />
-                        <div
-                            className="itemBg4"
-                            dangerouslySetInnerHTML={{
-                                __html: pumpkin,
-                            }}
-                        />
-                        <div
-                            className="itemBg5"
-                            dangerouslySetInnerHTML={{
-                                __html: spider,
-                            }}
-                        />
-                        <span
-                            className="itemContent"
-                            dangerouslySetInnerHTML={{
-                                __html: selectValue?.content ?? "",
-                            }}
-                        />
-                    </div>
+                        dangerouslySetInnerHTML={{
+                            __html: selectValue?.content ?? "",
+                        }}
+                    />
                 )}
             </Context.Provider>
         </div>

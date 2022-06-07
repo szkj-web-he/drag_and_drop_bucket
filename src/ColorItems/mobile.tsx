@@ -1,7 +1,7 @@
 import React from "react";
 import { Item } from "../item";
-import bg from "../Assets/svg/bg_product.svg";
-import bg1 from "../Assets/svg/bg_product1.svg";
+import flower from "../Assets/svg/lotus_flower.svg";
+import Iframe from "../typeIcon";
 import { DeskProps } from "./desk";
 
 export const Mobile: React.FC<DeskProps> = ({ colors, activeIndex }) => {
@@ -15,23 +15,13 @@ export const Mobile: React.FC<DeskProps> = ({ colors, activeIndex }) => {
                             key={item.code}
                             data-i={n}
                         >
+                            <Iframe className="storageCabinet_view" />
                             <div
                                 className="storageCabinet_itemBg"
                                 dangerouslySetInnerHTML={{
-                                    __html: bg,
+                                    __html: flower,
                                 }}
                             />
-
-                            <div
-                                className="storageCabinet_itemBg1"
-                                dangerouslySetInnerHTML={{
-                                    __html: bg1,
-                                }}
-                            />
-                            <div className="storageCabinet_itemBg2" />
-                            <div className="storageCabinet_itemBg3" />
-                            <div className="storageCabinet_itemBg4" />
-
                             <div className="storageCabinet_itemTitle">{item.content}</div>
                             <div className="storageCabinet_itemValues">
                                 <Item values={item.values} index={n} />

@@ -5,8 +5,7 @@ import { stopSelect } from "./noSelected";
 import { useMContext } from "./context";
 import { getScrollValue } from "./getScrollValue";
 import { deepCloneData, OptionProps } from "./unit";
-import spider from "./Assets/svg/spider.svg";
-import pumpkin from "./Assets/svg/pumpkin.svg";
+
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -21,7 +20,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const { isMobile, moveFn, valueChangeFn, basketFn } = useMContext();
+    const { isMobile, handleMoveCallback, handleValueChangeCallback, basketFn } = useMContext();
 
     const selectedFn = useRef<typeof document.onselectstart>(null);
 
@@ -61,8 +60,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             y = position.pageY;
             basketFn.current.move(position.clientX, position.clientY);
         }
-
-        moveFn.current({
+        handleMoveCallback({
             x: x - point.current.offsetX,
             y: y - point.current.offsetY,
         });
@@ -86,7 +84,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         });
 
         document.onselectstart = selectedFn.current;
-        valueChangeFn.current(undefined);
+        handleValueChangeCallback(undefined);
 
         selectValueRef.current = undefined;
         setSelectValue(undefined);
@@ -140,7 +138,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             ...selectValueRef.current,
         });
 
-        valueChangeFn.current({
+        handleValueChangeCallback({
             code: item.code,
             content: item.content,
             width: rect.width,
@@ -150,7 +148,7 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         const left = rect.left + scrollData.x;
         const top = rect.top + scrollData.y;
 
-        moveFn.current({
+        handleMoveCallback({
             x: left,
             y: top,
         });
@@ -190,50 +188,28 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <>
-            {list.map((item) => {
-                return (
-                    <div
-                        className={`item${selectValue?.code === item.code ? " gray" : ""}`}
-                        key={item.code}
-                        {...(isMobile
-                            ? {
-                                  onTouchStart: (e) => {
-                                      handleTouchStart(item, e);
-                                  },
-                                  onTouchMove: handleMove,
-                                  onTouchEnd: handleTouchEnd,
-                              }
-                            : {
-                                  onMouseDown: (e) => {
-                                      handleMouseDown(item, e);
-                                  },
-                              })}
-                    >
-                        <div className="itemBg1" />
-                        <div className="itemBg2" />
-                        <div className="itemBg3" />
-                        <div
-                            className="itemBg4"
-                            dangerouslySetInnerHTML={{
-                                __html: pumpkin,
-                            }}
-                        />
-                        <div
-                            className="itemBg5"
-                            dangerouslySetInnerHTML={{
-                                __html: spider,
-                            }}
-                        />
-
-                        <span
-                            className="itemContent"
-                            dangerouslySetInnerHTML={{
-                                __html: item.content,
-                            }}
-                        />
-                    </div>
-                );
-            })}
+            {list.map((item) => (
+                <div
+                    className={`item${selectValue?.code === item.code ? " gray" : ""}`}
+                    key={item.code}
+                    {...(isMobile
+                        ? {
+                              onTouchStart: (e) => {
+                                  handleTouchStart(item, e);
+                              },
+                              onTouchMove: handleMove,
+                              onTouchEnd: handleTouchEnd,
+                          }
+                        : {
+                              onMouseDown: (e) => {
+                                  handleMouseDown(item, e);
+                              },
+                          })}
+                    dangerouslySetInnerHTML={{
+                        __html: item.content,
+                    }}
+                />
+            ))}
         </>
     );
 };

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Item } from "../item";
 import { ScrollComponent } from "../Scroll";
-import { Icon } from "../icon";
 import { DeskProps } from "./desk";
-import bg from "../Assets/svg/bg_product.svg";
-import bg1 from "../Assets/svg/bg_product1.svg";
+import flower from "../Assets/svg/lotus_flower.svg";
+import Iframe from "../typeIcon";
+import Arrow from "../arrow";
+import ArrowBg from "../arrowBg";
 
 export const SmallDesk: React.FC<DeskProps> = ({ colors, activeIndex }) => {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -145,13 +146,15 @@ export const SmallDesk: React.FC<DeskProps> = ({ colors, activeIndex }) => {
                         className={`arrowContainer_pre${scrollStatus === 0 ? " gray" : ""}`}
                         onClick={toLeft}
                     >
-                        <Icon className="arrowContainer_icon" />
+                        <ArrowBg className="arrowContainer_bgIcon" />
+                        <Arrow className="arrowContainer_icon" />
                     </div>
                     <div
                         className={`arrowContainer_next${scrollStatus === 1 ? " gray" : ""}`}
                         onClick={toRight}
                     >
-                        <Icon className="arrowContainer_icon" />
+                        <ArrowBg className="arrowContainer_bgIcon" />
+                        <Arrow className="arrowContainer_icon" />
                     </div>
                 </div>
             )}
@@ -172,22 +175,13 @@ export const SmallDesk: React.FC<DeskProps> = ({ colors, activeIndex }) => {
                                 key={item.code}
                                 data-i={n}
                             >
+                                <Iframe className="storageCabinet_view" />
                                 <div
                                     className="storageCabinet_itemBg"
                                     dangerouslySetInnerHTML={{
-                                        __html: bg,
+                                        __html: flower,
                                     }}
                                 />
-
-                                <div
-                                    className="storageCabinet_itemBg1"
-                                    dangerouslySetInnerHTML={{
-                                        __html: bg1,
-                                    }}
-                                />
-                                <div className="storageCabinet_itemBg2" />
-                                <div className="storageCabinet_itemBg3" />
-                                <div className="storageCabinet_itemBg4" />
 
                                 <div className="storageCabinet_itemTitle">{item.content}</div>
                                 <div className="storageCabinet_itemValues">
