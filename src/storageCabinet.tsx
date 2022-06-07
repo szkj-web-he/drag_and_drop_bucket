@@ -72,10 +72,8 @@ export const StorageCabinet: React.FC = () => {
                 timer && window.clearTimeout(timer);
                 timer = window.setTimeout(() => {
                     const n = findIndex(x, y);
-                    if (typeof n === "number") {
-                        indexRef.current = n;
-                        setActiveIndex(indexRef.current);
-                    }
+                    indexRef.current = n ?? undefined;
+                    setActiveIndex(indexRef.current);
                 });
             },
             up: (res: BasketUpFnProps) => {

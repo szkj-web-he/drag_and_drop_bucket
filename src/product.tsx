@@ -30,8 +30,6 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         offsetY: 0,
     });
 
-    const touchStatus = useRef(false);
-
     const selectValueRef = useRef<OptionProps>();
     const [selectValue, setSelectValue] = useState(
         selectValueRef.current ? { ...selectValueRef.current } : undefined,
@@ -106,12 +104,6 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
 
     // 当手离开屏幕时
     const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-        if (!touchStatus.current) {
-            return;
-        }
-
-        touchStatus.current = false;
-
         const position = e.changedTouches[0];
 
         handleUp(position.clientX, position.clientY);
@@ -126,8 +118,6 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             y: number;
         },
     ) => {
-        touchStatus.current = true;
-
         const rect = e.currentTarget.getBoundingClientRect();
 
         const scrollData = getScrollValue();
