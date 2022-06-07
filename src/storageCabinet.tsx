@@ -7,9 +7,6 @@ import { comms } from ".";
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 
-// const colors = options.map(item => { const key = Object.keys(item)[0]; return item[key] });
-
-// import { colors } from './defaultData';
 import { Desk } from "./ColorItems/desk";
 import { SmallDesk } from "./ColorItems/smallDesk";
 import { Tablet } from "./ColorItems/tablet";
@@ -72,10 +69,9 @@ export const StorageCabinet: React.FC = () => {
                 timer && window.clearTimeout(timer);
                 timer = window.setTimeout(() => {
                     const n = findIndex(x, y);
-                    if (typeof n === "number") {
-                        indexRef.current = n;
-                        setActiveIndex(indexRef.current);
-                    }
+
+                    indexRef.current = n ?? undefined;
+                    setActiveIndex(indexRef.current);
                 });
             },
             up: (res: BasketUpFnProps) => {
