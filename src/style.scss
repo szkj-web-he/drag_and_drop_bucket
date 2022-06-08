@@ -34,20 +34,20 @@ body {
 
 .wrapper {
     background-color: #fff;
-
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-flow: column nowrap;
+    overflow: auto;
     &:not(.mobile) {
         overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-flow: column nowrap;
     }
 }
 
 @media screen and (max-width: 1000px) {
     .wrapper {
         &:not(.mobile) {
-            overflow: auto;
+            display: block;
         }
     }
 }
