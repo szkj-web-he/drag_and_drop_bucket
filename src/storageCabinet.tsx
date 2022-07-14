@@ -51,7 +51,7 @@ export const StorageCabinet: React.FC = () => {
         const findIndex = (x: number, y: number) => {
             const els = document.elementsFromPoint(x, y);
             let n: number | null = null;
-            for (let i = 0; i < els.length; ) {
+            for (let i = 0; i < els.length;) {
                 const el = els[i];
                 const classAttr = el.getAttribute("class")?.split(" ");
                 if (classAttr?.includes("storageCabinet_item")) {
@@ -132,12 +132,34 @@ export const StorageCabinet: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const data: Record<string, string> = {};
-        for (let i = 0; i < list.length; i++) {
-            data[list[i].code] = JSON.stringify(list[i].values.map((item) => item.code));
+        const data: Record<string, Record<string, 0 | 1>> = {};
+
+        const rows = comms.config.options?.[0] ?? [];
+        const cols = comms.config.options?.[1] ?? [];
+
+        for (let i = 0; i < rows.length; i++) {
+            const subData: Record<string, 0 | 1> = {};
+
+
+            for (let j = 0; j < cols.length; j++) {
+                const item = cols[j];
+                let val: 0 | 1 = 0;
+                const selectData = list.find(a => a.code === rows[i].code);
+
+                if (selectData?.values.some(a => a.code === item.code)) {
+                    val = 1;
+                }
+                subData[item.code] = val;
+
+
+            }
+            data[rows[i].code] = subData;
         }
+
+
         comms.state = data;
-    }, [list]);
+
+    }, [list])
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
