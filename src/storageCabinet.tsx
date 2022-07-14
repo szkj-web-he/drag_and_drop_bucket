@@ -60,17 +60,44 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
         };
     }, []);
 
+
+    useEffect(() => {
+        const data: Record<string, Record<string, 0 | 1>> = {};
+
+        const rows = comms.config.options?.[0] ?? [];
+        const cols = comms.config.options?.[1] ?? [];
+
+        for (let i = 0; i < rows.length; i++) {
+            const subData: Record<string, 0 | 1> = {};
+
+
+            for (let j = 0; j < cols.length; j++) {
+                const item = cols[j];
+                let val: 0 | 1 = 0;
+                const selectData = list.find(a => a.code === rows[i].code);
+
+                if (selectData?.values.some(a => a.code === item.code)) {
+                    val = 1;
+                }
+                subData[item.code] = val;
+
+
+            }
+            data[rows[i].code] = subData;
+        }
+
+
+        comms.state = data;
+
+        console.log(JSON.stringify(data))
+    }, [list])
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
     const handleColorChange = (res: ListItemProps[]) => {
         setList([...res]);
-        const data: Record<string, string> = {};
-        for (let i = 0; i < res.length; i++) {
-            data[res[i].code] = JSON.stringify(res[i].values.map((item) => item.code));
-        }
-        comms.state = data;
+
     };
 
     let classStr = "storageCabinet_wrap";
