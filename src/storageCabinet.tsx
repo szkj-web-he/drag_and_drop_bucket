@@ -89,7 +89,6 @@ export const StorageCabinet: React.FC<StorageCabinetProps> = ({ handleChange, va
 
         comms.state = data;
 
-        console.log(JSON.stringify(data))
     }, [list])
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
