@@ -1,6 +1,7 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
+import { useLayoutEffect } from "react";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -13,26 +14,80 @@ interface TempProps {
 const Temp: React.FC<TempProps> = ({ style, className }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    const [el, setEl] = useState<SVGElement | null>(null);
-    const [size, setSize] = useState<{
-        width: number;
-        height: number;
-    }>();
+    // const [el, setEl] = useState<HTMLCanvasElement | null>(null);
+
+    const ref = useRef<HTMLCanvasElement | null>(null);
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
-    useEffect(() => {
+    useLayoutEffect(() => {
+        const drawRoundRectPath = (
+            ctx: CanvasRenderingContext2D,
+            width: number,
+            height: number,
+            x: number,
+            y: number,
+        ) => {
+            ctx.beginPath();
+
+            const r = 6;
+            //右下角
+            ctx.arc(width - r, height - r, r, 0, Math.PI / 2);
+            ctx.lineTo(r + x, height);
+
+            //左下角
+            ctx.arc(r + x, height - r, r, Math.PI / 2, Math.PI);
+            ctx.lineTo(x, r + y);
+
+            //左上角
+            ctx.arc(r + x, r + y, r, Math.PI, (Math.PI / 2) * 3);
+            ctx.lineTo(width - r, y);
+
+            //右上角
+            ctx.arc(width - r, r + y, r, (Math.PI / 2) * 3, Math.PI * 2);
+            ctx.lineTo(width, height - r);
+
+            ctx.closePath();
+        };
+
         const fn = () => {
-            if (!el) {
+            const node = ref.current;
+            if (!node) {
                 return;
             }
-            const parent = el.parentElement;
+            const parent = node.parentElement;
 
             if (parent instanceof HTMLElement) {
-                setSize({
-                    width: parent.offsetWidth,
-                    height: parent.offsetHeight,
-                });
+                const width = parent.offsetWidth ?? 52;
+                const height = parent.offsetHeight ?? 37;
+
+                const ctx = node.getContext("2d");
+                if (!ctx) {
+                    return;
+                }
+                ctx.clearRect(0, 0, width, height);
+
+                node.width = width;
+                node.height = height;
+
+                drawRoundRectPath(ctx, width - 1, height - 1, 1, 1);
+                ctx.save();
+
+                const bg = ctx.createLinearGradient(-14, -12.5, width, height - 4);
+                bg.addColorStop(0, "rgba(87,241,241,0.36)");
+                bg.addColorStop(1, "rgba(0,69,166,0.4)");
+                ctx.fillStyle = bg;
+                ctx.fill();
+
+                const strokeStyle = ctx.createLinearGradient(4.5, -3.5, width + 13, height + 11.5);
+                strokeStyle.addColorStop(0, "#57F1F1");
+                strokeStyle.addColorStop(1, "#007EFE");
+                ctx.restore();
+                ctx.strokeStyle = strokeStyle;
+
+                ctx.lineWidth = 0.6;
+
+                ctx.stroke();
             }
         };
         fn();
@@ -40,94 +95,14 @@ const Temp: React.FC<TempProps> = ({ style, className }) => {
         return () => {
             window.removeEventListener("resize", fn);
         };
-    }, [el]);
+    }, []);
 
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
-    const width = size?.width ?? 52;
-    const height = size?.height ?? 37;
 
-    return (
-        <svg
-            viewBox={`0 0 ${width} ${height}`}
-            style={style}
-            className={className}
-            fill="none"
-            width={width}
-            height={height}
-            ref={setEl}
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <g filter="url(#filter0_b_4520_10915)">
-                <rect
-                    width={width}
-                    height={height}
-                    rx="6"
-                    fill="url(#paint0_linear_4520_10915)"
-                    fillOpacity="0.4"
-                />
-                <rect
-                    x="0.3"
-                    y="0.3"
-                    strokeDashoffset="0"
-                    width={width - 0.6}
-                    height={height - 0.6}
-                    rx="5.7"
-                    stroke="url(#paint1_linear_4520_10915)"
-                    strokeWidth="0.6"
-                />
-            </g>
-            <defs>
-                <filter
-                    id="filter0_b_4520_10915"
-                    x="-6"
-                    y="-6"
-                    width={width + 12}
-                    height={height + 12}
-                    filterUnits="userSpaceOnUse"
-                    colorInterpolationFilters="sRGB"
-                >
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feGaussianBlur in="BackgroundImage" stdDeviation="3" />
-                    <feComposite
-                        in2="SourceAlpha"
-                        operator="in"
-                        result="effect1_backgroundBlur_4520_10915"
-                    />
-                    <feBlend
-                        mode="normal"
-                        in="SourceGraphic"
-                        in2="effect1_backgroundBlur_4520_10915"
-                        result="shape"
-                    />
-                </filter>
-                <linearGradient
-                    id="paint0_linear_4520_10915"
-                    x1="-14"
-                    y1="-12.5"
-                    x2={width}
-                    y2={height - 4}
-                    gradientUnits="userSpaceOnUse"
-                >
-                    <stop stopColor="#57F1F1" stopOpacity="0.9" />
-                    <stop offset="1" stopColor="#0045A6" />
-                </linearGradient>
-                <linearGradient
-                    id="paint1_linear_4520_10915"
-                    x1="4.5"
-                    y1="-3.5"
-                    x2={width + 13}
-                    y2={height + 11.5}
-                    gradientUnits="userSpaceOnUse"
-                >
-                    <stop stopColor="#57F1F1" />
-                    <stop offset="1" stopColor="#007EFE" />
-                </linearGradient>
-            </defs>
-        </svg>
-    );
+    return <canvas className={className} style={style} ref={ref} />;
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */
 export default Temp;

@@ -246,17 +246,6 @@ body {
     z-index: 1;
 }
 
-.storageCabinet_view {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    width: 100%;
-    height: 100%;
-    color: transparent;
-    transition: all 0.2s linear;
-}
-
 .storageCabinet_item {
     @include gridCol(2);
     height: 180px;
@@ -272,11 +261,9 @@ body {
     background: #0e446f;
     box-shadow: inset 0px 4px 35px rgba(0, 143, 188, 0.25);
     border-radius: 6px;
-
     &.active {
-        .storageCabinet_view {
-            color: #e9f7f8;
-        }
+        box-shadow: inset 0px 4px 35px rgba(0, 143, 188, 0.25),
+            0 0 5px 1px rgba(255, 255, 255, 0.25);
     }
 
     &:first-child {
