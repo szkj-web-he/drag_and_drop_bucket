@@ -4,8 +4,9 @@
 import React from "react";
 import { Product } from "./product";
 import { comms } from ".";
-import { useMContext } from "./context";
 import { ScrollComponent } from "./Scroll";
+import Frame from "./frame";
+import { useMContext } from "./context";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 
@@ -31,23 +32,29 @@ export const Warehouse: React.FC = () => {
             </div>
 
             {isMobile ? (
-                <div className="warehouse_items">
-                    <div className="warehouse_body">
-                        <Product list={params} />
+                <div className="warehouse_container">
+                    <Frame />
+                    <div className="warehouse_items">
+                        <div className="warehouse_body">
+                            <Product list={params} />
+                        </div>
                     </div>
                 </div>
             ) : (
-                <ScrollComponent
-                    className="warehouse_scrollWrap"
-                    bodyClassName="warehouse_scrollBody"
-                    hidden={{
-                        x: true,
-                    }}
-                >
-                    <div className="warehouse_body">
-                        <Product list={params} />
-                    </div>
-                </ScrollComponent>
+                <div className="warehouse_container">
+                    <Frame />
+                    <ScrollComponent
+                        className="warehouse_scrollWrap"
+                        bodyClassName="warehouse_scrollBody"
+                        hidden={{
+                            x: true,
+                        }}
+                    >
+                        <div className="warehouse_body">
+                            <Product list={params} />
+                        </div>
+                    </ScrollComponent>
+                </div>
             )}
         </div>
     );
