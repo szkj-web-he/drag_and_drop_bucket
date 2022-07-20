@@ -343,7 +343,7 @@ export const Tablet: React.FC<DeskProps> = ({ colors, activeIndex, children }) =
                                 {colorArr.map((item, index) => {
                                     return (
                                         <Box
-                                            index={n}
+                                            index={n * 6 + index}
                                             key={`${item.code}`}
                                             tag="li"
                                             isActive={activeIndex === n * 6 + index}
