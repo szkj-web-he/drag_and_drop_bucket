@@ -412,7 +412,6 @@ body {
     overflow: hidden;
     background: #fafafa;
     border-radius: 10px;
-    padding: 0 12px 20px 12px;
     box-sizing: border-box;
 }
 
@@ -421,6 +420,8 @@ body {
     align-items: center;
     justify-content: flex-start;
     flex-flow: row nowrap;
+    padding: 0 12px 20px 12px;
+    box-sizing: border-box;
 }
 
 .tablet_colorList {
@@ -430,11 +431,16 @@ body {
     align-items: flex-start;
     align-content: flex-start;
     margin: 0;
-    padding: 0 20px 20px;
+    margin-right: 24px;
+    padding: 0 8px;
     width: 100%;
     flex: 0 0 auto;
+    box-sizing: border-box;
     .storageCabinet_item {
         list-style: none;
+    }
+    &:last-child {
+        margin-right: 0;
     }
 }
 
