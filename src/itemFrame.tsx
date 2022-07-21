@@ -14,7 +14,6 @@ interface TempProps {
 const Temp: React.FC<TempProps> = ({ style, className }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
-    // const [el, setEl] = useState<HTMLCanvasElement | null>(null);
 
     const ref = useRef<HTMLCanvasElement | null>(null);
     /* <------------------------------------ **** STATE END **** ------------------------------------ */

@@ -2,10 +2,12 @@
 /** This section will include all the necessary dependence for this tsx file */
 import React, { useState, useRef } from "react";
 import { stopSelect } from "./noSelected";
-import { useMContext } from "./context";
+import { MoveFnProps, useMContext } from "./context";
 import { getScrollValue } from "./getScrollValue";
 import { deepCloneData, OptionProps } from "./unit";
 import Frame from "./itemFrame";
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -20,13 +22,17 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const { isMobile, handleMoveCallback, handleValueChangeCallback, basketFn } = useMContext();
+    const { isMobile, basketFn } = useMContext();
 
     const selectedFn = useRef<typeof document.onselectstart>(null);
+
+    const [position, setPosition] = useState<MoveFnProps>();
 
     const point = useRef({
         offsetX: 0,
         offsetY: 0,
+        width: 0,
+        height: 0,
     });
 
     const selectValueRef = useRef<OptionProps>();
@@ -34,38 +40,53 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         selectValueRef.current ? { ...selectValueRef.current } : undefined,
     );
 
+    const timer = useRef<number>();
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
-
+    useEffect(() => {
+        return () => {
+            timer.current && window.clearTimeout(timer.current);
+            timer.current = undefined;
+        };
+    }, []);
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
     // 当移动时
     const handleMove = (e: MouseEvent | React.TouchEvent<HTMLDivElement>) => {
-        if (!selectValueRef.current) {
+        if (timer.current) {
             return;
         }
+        timer.current = window.setTimeout(() => {
+            timer.current = undefined;
+            if (!selectValueRef.current) {
+                return;
+            }
 
-        let x = 0;
-        let y = 0;
+            let x = 0;
+            let y = 0;
 
-        if (e instanceof MouseEvent) {
-            x = e.pageX;
-            y = e.pageY;
-            basketFn.current.move(e.clientX, e.clientY);
-        } else {
-            const position = e.changedTouches[0];
-            x = position.pageX;
-            y = position.pageY;
-            basketFn.current.move(position.clientX, position.clientY);
-        }
-        handleMoveCallback({
-            x: x - point.current.offsetX,
-            y: y - point.current.offsetY,
+            if (e instanceof MouseEvent) {
+                x = e.pageX;
+                y = e.pageY;
+                basketFn.current.move(e.clientX, e.clientY);
+            } else {
+                const position = e.changedTouches[0];
+                x = position.pageX;
+                y = position.pageY;
+                basketFn.current.move(position.clientX, position.clientY);
+            }
+            setPosition({
+                x: x - point.current.offsetX,
+                y: y - point.current.offsetY,
+            });
         });
     };
 
     // 当鼠标 或者手 弹起时的通用事件
     const handleUp = (x: number, y: number) => {
+        timer.current && window.clearTimeout(timer.current);
+        timer.current = undefined;
+
         if (!selectValueRef.current) {
             return;
         }
@@ -82,7 +103,6 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         });
 
         document.onselectstart = selectedFn.current;
-        handleValueChangeCallback(undefined);
 
         selectValueRef.current = undefined;
         setSelectValue(undefined);
@@ -90,6 +110,8 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         point.current = {
             offsetX: 0,
             offsetY: 0,
+            width: 0,
+            height: 0,
         };
     };
 
@@ -116,6 +138,8 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             y: number;
         },
     ) => {
+        timer.current && window.clearTimeout(timer.current);
+        timer.current = undefined;
         const rect = e.currentTarget.getBoundingClientRect();
 
         const scrollData = getScrollValue();
@@ -128,17 +152,9 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             ...selectValueRef.current,
         });
 
-        handleValueChangeCallback({
-            code: item.code,
-            content: item.content,
-            width: rect.width,
-            height: rect.height,
-        });
-
         const left = rect.left + scrollData.x;
         const top = rect.top + scrollData.y;
-
-        handleMoveCallback({
+        setPosition({
             x: left,
             y: top,
         });
@@ -148,6 +164,8 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         point.current = {
             offsetX: position.x - left,
             offsetY: position.y - top,
+            width: rect.width,
+            height: rect.height,
         };
     };
 
@@ -206,6 +224,30 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
                     />
                 </div>
             ))}
+
+            {createPortal(
+                !!selectValue && (
+                    <div
+                        className="floating"
+                        style={{
+                            left: `${position?.x ?? 0}px`,
+                            top: `${position?.y ?? 0}px`,
+                            width: `${point.current.width}px`,
+                            height: `${point.current.height}px`,
+                        }}
+                    >
+                        <Frame className={`itemBg`} />
+
+                        <div
+                            className={`itemContent`}
+                            dangerouslySetInnerHTML={{
+                                __html: selectValue?.content ?? "",
+                            }}
+                        />
+                    </div>
+                ),
+                document.querySelector("body>div") ?? document.body,
+            )}
         </>
     );
 };

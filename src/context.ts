@@ -6,10 +6,7 @@ export interface MoveFnProps {
     y: number;
 }
 
-export interface ValueChangeFnProps extends OptionProps {
-    width: number;
-    height: number;
-}
+export type ValueChangeFnProps = OptionProps;
 
 export interface BasketUpFnProps {
     index?: number;
@@ -20,8 +17,6 @@ export interface BasketUpFnProps {
 
 interface ContextDataProps {
     isMobile: boolean;
-    handleMoveCallback: (res?: MoveFnProps) => void;
-    handleValueChangeCallback: (res?: ValueChangeFnProps) => void;
     basketFn: React.MutableRefObject<{
         move: (x: number, y: number) => void;
         up: (res: BasketUpFnProps) => void;
@@ -30,8 +25,6 @@ interface ContextDataProps {
 const contextData = (): ContextDataProps => ({
     isMobile: false,
 
-    handleMoveCallback: () => undefined,
-    handleValueChangeCallback: () => undefined,
     basketFn: {
         current: {
             move: () => undefined,

@@ -2,15 +2,12 @@ import "./font";
 import "./style.scss";
 
 import { Warehouse } from "./warehouse";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StorageCabinet } from "./storageCabinet";
-import { BasketUpFnProps, Context, MoveFnProps, ValueChangeFnProps } from "./context";
+import { BasketUpFnProps, Context } from "./context";
 import { isMobile } from "./isMobile";
-
 import { PluginComms, ConfigYML } from "@possie-engine/dr-plugin-sdk";
 import Hr from "./hr";
-
-import Frame from "./itemFrame";
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
@@ -23,15 +20,12 @@ export const comms = new PluginComms({
     state: unknown;
     renderOnReady: (res: React.ReactNode) => void;
 };
+console.log(process.env.NODE_ENV);
 const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
     const [mobileStatus, setMobileStatus] = useState(isMobile);
-
-    const [position, setPosition] = useState<MoveFnProps>();
-
-    const [selectValue, setSelectValue] = useState<ValueChangeFnProps>();
 
     const basketFn = useRef<{
         move: (x: number, y: number) => undefined;
@@ -58,13 +52,9 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
-    const handleMoveCallback = useCallback((res?: MoveFnProps) => setPosition(res), []);
-
-    const handleValueChangeCallback = useCallback((res?: ValueChangeFnProps) => {
-        setSelectValue(res);
-    }, []);
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
+        // <Profiler>
         <div className={`wrapper${mobileStatus ? ` mobile` : ""}`}>
             <div className="question">
                 <div
@@ -83,36 +73,15 @@ const Main: React.FC = () => {
             <Context.Provider
                 value={{
                     isMobile: mobileStatus,
-                    handleMoveCallback,
-                    handleValueChangeCallback,
                     basketFn,
                 }}
             >
                 <Warehouse />
                 <Hr />
                 <StorageCabinet />
-                {!!selectValue && (
-                    <div
-                        className="floating"
-                        style={{
-                            left: `${position?.x ?? 0}px`,
-                            top: `${position?.y ?? 0}px`,
-                            width: `${selectValue.width}px`,
-                            height: `${selectValue.height}px`,
-                        }}
-                    >
-                        <Frame className={`itemBg`} />
-
-                        <div
-                            className={`itemContent`}
-                            dangerouslySetInnerHTML={{
-                                __html: selectValue?.content ?? "",
-                            }}
-                        />
-                    </div>
-                )}
             </Context.Provider>
         </div>
+        // </Profiler>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es5",
+        "sourceMap": true,
         "lib": [
             "dom",
             "dom.iterable",
@@ -23,7 +24,7 @@
             "./types",
             "node_modules/@types"
         ],
-        "baseUrl": "src",
+        "baseUrl": "./src",
         "paths": {
             "~/*": [
                 "*"
@@ -36,7 +37,7 @@
         }
     ],
     "include": [
-        "src"
+        "./src"
     ],
     "exclude": [
         "node_modules",
