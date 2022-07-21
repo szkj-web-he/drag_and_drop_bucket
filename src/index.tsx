@@ -20,7 +20,6 @@ export const comms = new PluginComms({
     state: unknown;
     renderOnReady: (res: React.ReactNode) => void;
 };
-console.log(process.env.NODE_ENV);
 const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
