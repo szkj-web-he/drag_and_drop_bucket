@@ -1,13 +1,12 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useState, useRef } from "react";
-import { stopSelect } from "./noSelected";
+import React, { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { MoveFnProps, useMContext } from "./context";
 import { getScrollValue } from "./getScrollValue";
-import { deepCloneData, OptionProps } from "./unit";
 import Frame from "./itemFrame";
-import { createPortal } from "react-dom";
-import { useEffect } from "react";
+import { stopSelect } from "./noSelected";
+import { deepCloneData, OptionProps } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -40,53 +39,38 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
         selectValueRef.current ? { ...selectValueRef.current } : undefined,
     );
 
-    const timer = useRef<number>();
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
-    useEffect(() => {
-        return () => {
-            timer.current && window.clearTimeout(timer.current);
-            timer.current = undefined;
-        };
-    }, []);
+
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
     // 当移动时
     const handleMove = (e: MouseEvent | React.TouchEvent<HTMLDivElement>) => {
-        if (timer.current) {
+        if (!selectValueRef.current) {
             return;
         }
-        timer.current = window.setTimeout(() => {
-            timer.current = undefined;
-            if (!selectValueRef.current) {
-                return;
-            }
 
-            let x = 0;
-            let y = 0;
+        let x = 0;
+        let y = 0;
 
-            if (e instanceof MouseEvent) {
-                x = e.pageX;
-                y = e.pageY;
-                basketFn.current.move(e.clientX, e.clientY);
-            } else {
-                const position = e.changedTouches[0];
-                x = position.pageX;
-                y = position.pageY;
-                basketFn.current.move(position.clientX, position.clientY);
-            }
-            setPosition({
-                x: x - point.current.offsetX,
-                y: y - point.current.offsetY,
-            });
+        if (e instanceof MouseEvent) {
+            x = e.pageX;
+            y = e.pageY;
+            // basketFn.current.move(e.clientX, e.clientY);
+        } else {
+            const position = e.changedTouches[0];
+            x = position.pageX;
+            y = position.pageY;
+            // basketFn.current.move(position.clientX, position.clientY);
+        }
+        setPosition({
+            x: x - point.current.offsetX,
+            y: y - point.current.offsetY,
         });
     };
 
     // 当鼠标 或者手 弹起时的通用事件
     const handleUp = (x: number, y: number) => {
-        timer.current && window.clearTimeout(timer.current);
-        timer.current = undefined;
-
         if (!selectValueRef.current) {
             return;
         }
@@ -138,8 +122,6 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
             y: number;
         },
     ) => {
-        timer.current && window.clearTimeout(timer.current);
-        timer.current = undefined;
         const rect = e.currentTarget.getBoundingClientRect();
 
         const scrollData = getScrollValue();
@@ -225,13 +207,14 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
                 </div>
             ))}
 
-            {createPortal(
-                !!selectValue && (
+            {selectValue &&
+                createPortal(
                     <div
                         className="floating"
                         style={{
-                            left: `${position?.x ?? 0}px`,
-                            top: `${position?.y ?? 0}px`,
+                            top: 0,
+                            left: 0,
+                            transform: `translate(${position?.x ?? 0}px,${position?.y ?? 0}px)`,
                             width: `${point.current.width}px`,
                             height: `${point.current.height}px`,
                         }}
@@ -244,10 +227,9 @@ export const Product: React.FC<ProductProps> = ({ list, index }) => {
                                 __html: selectValue?.content ?? "",
                             }}
                         />
-                    </div>
-                ),
-                document.querySelector("body>div") ?? document.body,
-            )}
+                    </div>,
+                    document.querySelector("body>div") ?? document.body,
+                )}
         </>
     );
 };

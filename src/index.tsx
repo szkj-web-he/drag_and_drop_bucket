@@ -53,7 +53,6 @@ const Main: React.FC = () => {
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        // <Profiler>
         <div className={`wrapper${mobileStatus ? ` mobile` : ""}`}>
             <div className="question">
                 <div
@@ -80,7 +79,6 @@ const Main: React.FC = () => {
                 <StorageCabinet />
             </Context.Provider>
         </div>
-        // </Profiler>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

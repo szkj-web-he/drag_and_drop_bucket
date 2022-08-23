@@ -643,6 +643,15 @@ body {
     border-radius: 12px;
 }
 
+.frameBorder {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    top: 0;
+    left: 0;
+}
+
 .storageCabinet_itemBg_lt {
     position: absolute;
     top: -1px;

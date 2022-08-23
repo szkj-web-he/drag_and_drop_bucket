@@ -30,19 +30,15 @@ export const Warehouse: React.FC = () => {
                 </span>
                 项
             </div>
-
-            {isMobile ? (
-                <div className="warehouse_container">
-                    <Frame />
+            <div className="warehouse_container">
+                <Frame type="top" />
+                {isMobile ? (
                     <div className="warehouse_items">
                         <div className="warehouse_body">
                             <Product list={params} />
                         </div>
                     </div>
-                </div>
-            ) : (
-                <div className="warehouse_container">
-                    <Frame />
+                ) : (
                     <ScrollComponent
                         className="warehouse_scrollWrap"
                         bodyClassName="warehouse_scrollBody"
@@ -54,8 +50,8 @@ export const Warehouse: React.FC = () => {
                             <Product list={params} />
                         </div>
                     </ScrollComponent>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };

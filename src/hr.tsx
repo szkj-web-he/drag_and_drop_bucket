@@ -53,7 +53,6 @@ const Temp: React.FC<TempProps> = ({ className }) => {
                 className="hr_icon"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                {/* 1147.5 */}
                 <path
                     d={`M7.62259 1.07324L0.977539 7.99728L5.15409 12.4995L5.24959 12.4L1.16854 7.99728L7.62264 1.27221L14.0836 7.9973L10.0198 12.4V12.6L${
                         width - 0.5

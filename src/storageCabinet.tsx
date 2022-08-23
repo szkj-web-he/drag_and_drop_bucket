@@ -1,18 +1,18 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BasketUpFnProps, useMContext } from "./context";
+import React, { useEffect, useRef, useState } from "react";
 import { comms } from ".";
+import { BasketUpFnProps, useMContext } from "./context";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 
 import { Desk } from "./ColorItems/desk";
+import { Mobile } from "./ColorItems/mobile";
 import { SmallDesk } from "./ColorItems/smallDesk";
 import { Tablet } from "./ColorItems/tablet";
-import { Mobile } from "./ColorItems/mobile";
-import { OptionProps } from "./unit";
 import Frame from "./frame";
+import { OptionProps } from "./unit";
 
 export interface ListItemProps {
     code: string;
@@ -47,7 +47,7 @@ export const StorageCabinet: React.FC = () => {
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         let timer: null | number = null;
         const findIndex = (x: number, y: number) => {
             const els = document.elementsFromPoint(x, y);
@@ -153,7 +153,6 @@ export const StorageCabinet: React.FC = () => {
             }
             data[rows[i].code] = subData;
         }
-
         comms.state = data;
     }, [list]);
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
@@ -167,21 +166,21 @@ export const StorageCabinet: React.FC = () => {
     if (isMobile) {
         mainEl = is375 ? (
             <Mobile activeIndex={activeIndex} colors={list}>
-                <Frame />
+                <Frame type="bottom" />
             </Mobile>
         ) : (
             <Tablet activeIndex={activeIndex} colors={list}>
-                <Frame />
+                <Frame type="bottom" />
             </Tablet>
         );
     } else {
         mainEl = is1024 ? (
             <SmallDesk activeIndex={activeIndex} colors={list}>
-                <Frame />
+                <Frame type="bottom" />
             </SmallDesk>
         ) : (
             <Desk activeIndex={activeIndex} colors={list}>
-                <Frame />
+                <Frame type="bottom" />
             </Desk>
         );
     }
