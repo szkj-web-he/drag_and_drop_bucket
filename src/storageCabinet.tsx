@@ -42,13 +42,12 @@ export const StorageCabinet: React.FC = () => {
 
     const indexRef = useRef<number>();
     const [activeIndex, setActiveIndex] = useState(indexRef.current);
-
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
     useEffect(() => {
-        let timer: null | number = null;
+        const timer: null | number = null;
         const findIndex = (x: number, y: number) => {
             const els = document.elementsFromPoint(x, y);
             let n: number | null = null;
@@ -67,12 +66,10 @@ export const StorageCabinet: React.FC = () => {
 
         basketFn.current = {
             move: (x: number, y: number) => {
-                timer && window.clearTimeout(timer);
-                timer = window.setTimeout(() => {
+                setActiveIndex((pre) => {
                     const n = findIndex(x, y);
-
                     indexRef.current = n ?? undefined;
-                    setActiveIndex(indexRef.current);
+                    return n ?? pre;
                 });
             },
             up: (res: BasketUpFnProps) => {

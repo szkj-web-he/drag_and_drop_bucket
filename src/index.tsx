@@ -1,4 +1,3 @@
-import "./font";
 import "./style.scss";
 
 import { Warehouse } from "./warehouse";

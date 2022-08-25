@@ -4,7 +4,7 @@ import React from "react";
 import { useMContext } from "./context";
 import { Product } from "./product";
 import { ScrollComponent } from "./Scroll";
-import { deepCloneData, OptionProps } from "./unit";
+import { OptionProps } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -24,7 +24,7 @@ export const Item: React.FC<ItemProps> = ({ values, index }) => {
 
     const content = (
         <div className="scrollBody">
-            <Product list={deepCloneData(values)} index={index} />
+            <Product list={values} index={index} />
         </div>
     );
 
