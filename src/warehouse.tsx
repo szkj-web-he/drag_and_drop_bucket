@@ -6,7 +6,6 @@ import { Product } from "./product";
 import { comms } from ".";
 import { ScrollComponent } from "./Scroll";
 import Frame from "./frame";
-import { useMContext } from "./context";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 
@@ -17,8 +16,6 @@ import { useMContext } from "./context";
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
 export const Warehouse: React.FC = () => {
-    const { isMobile } = useMContext();
-
     const params = comms.config.options?.[1] ?? [];
 
     return (
@@ -32,25 +29,17 @@ export const Warehouse: React.FC = () => {
             </div>
             <div className="warehouse_container">
                 <Frame type="top" />
-                {isMobile ? (
-                    <div className="warehouse_items">
-                        <div className="warehouse_body">
-                            <Product list={params} />
-                        </div>
+                <ScrollComponent
+                    className="warehouse_scrollWrap"
+                    bodyClassName="warehouse_scrollBody"
+                    hidden={{
+                        x: true,
+                    }}
+                >
+                    <div className="warehouse_body">
+                        <Product list={params} />
                     </div>
-                ) : (
-                    <ScrollComponent
-                        className="warehouse_scrollWrap"
-                        bodyClassName="warehouse_scrollBody"
-                        hidden={{
-                            x: true,
-                        }}
-                    >
-                        <div className="warehouse_body">
-                            <Product list={params} />
-                        </div>
-                    </ScrollComponent>
-                )}
+                </ScrollComponent>
             </div>
         </div>
     );

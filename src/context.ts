@@ -16,15 +16,12 @@ export interface BasketUpFnProps {
 }
 
 interface ContextDataProps {
-    isMobile: boolean;
     basketFn: React.MutableRefObject<{
         move: (x: number, y: number) => void;
         up: (res: BasketUpFnProps) => void;
     }>;
 }
 const contextData = (): ContextDataProps => ({
-    isMobile: false,
-
     basketFn: {
         current: {
             move: () => undefined,

@@ -7,6 +7,7 @@ import { getScrollValue } from "./getScrollValue";
 import Frame from "./itemFrame";
 import { stopSelect } from "./noSelected";
 import { OptionProps } from "./unit";
+import { useEffect } from "react";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -23,7 +24,7 @@ export const Product: React.FC<ProductProps> = memo(
         /* <------------------------------------ **** STATE START **** ------------------------------------ */
         /************* This section will include this component HOOK function *************/
 
-        const { isMobile, basketFn } = useMContext();
+        const { basketFn } = useMContext();
 
         const selectedFn = useRef<typeof document.onselectstart>(null);
 
@@ -37,7 +38,14 @@ export const Product: React.FC<ProductProps> = memo(
             OptionProps & { width: number; height: number }
         >();
 
+        const touchStatus = useRef(false);
+
+        const [translate, setTranslate] = useState<{ x: number; y: number }>();
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
+
+        useEffect(() => {
+            console.log(JSON.stringify(translate));
+        }, [translate]);
 
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
@@ -62,12 +70,10 @@ export const Product: React.FC<ProductProps> = memo(
                 basketFn.current.move(position.clientX, position.clientY);
             }
 
-            const el = document.querySelector(".floating");
-            if (el instanceof HTMLElement) {
-                el.style.transform = `translate(${x - point.current.offsetX}px,${
-                    y - point.current.offsetY
-                }px)`;
-            }
+            setTranslate({
+                x: x - point.current.offsetX,
+                y: y - point.current.offsetY,
+            });
         };
 
         // 当鼠标 或者手 弹起时的通用事件
@@ -91,7 +97,7 @@ export const Product: React.FC<ProductProps> = memo(
 
             selectValueRef.current = undefined;
             setSelectValue(undefined);
-
+            setTranslate(undefined);
             point.current = {
                 offsetX: 0,
                 offsetY: 0,
@@ -139,10 +145,10 @@ export const Product: React.FC<ProductProps> = memo(
             const left = rect.left + scrollData.x;
             const top = rect.top + scrollData.y;
 
-            const el = document.querySelector(".floating");
-            if (el instanceof HTMLElement) {
-                el.style.transform = `translate(${left}px,${top}px)`;
-            }
+            setTranslate({
+                x: left,
+                y: top,
+            });
 
             stopSelect(e, selectedFn, true);
 
@@ -168,6 +174,7 @@ export const Product: React.FC<ProductProps> = memo(
         //当手触摸时
         const handleTouchStart = (item: OptionProps, e: React.TouchEvent<HTMLDivElement>) => {
             const position = e.changedTouches[0];
+            touchStatus.current = true;
             e.stopPropagation();
 
             handleDown(item, e, {
@@ -183,19 +190,20 @@ export const Product: React.FC<ProductProps> = memo(
                     <div
                         className={`item${selectValue?.code === item.code ? " gray" : ""}`}
                         key={item.code}
-                        {...(isMobile
-                            ? {
-                                  onTouchStart: (e) => {
-                                      handleTouchStart(item, e);
-                                  },
-                                  onTouchMove: handleMove,
-                                  onTouchEnd: handleTouchEnd,
-                              }
-                            : {
-                                  onMouseDown: (e) => {
-                                      handleMouseDown(item, e);
-                                  },
-                              })}
+                        onTouchStart={(e) => {
+                            handleTouchStart(item, e);
+                        }}
+                        onTouchMove={(e) => {
+                            if (!touchStatus.current) {
+                                return;
+                            }
+
+                            handleMove(e);
+                        }}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={(e) => {
+                            handleMouseDown(item, e);
+                        }}
                     >
                         <Frame className={`itemBg`} />
 
@@ -217,6 +225,9 @@ export const Product: React.FC<ProductProps> = memo(
                                 left: 0,
                                 width: `${selectValue.width}px`,
                                 height: `${selectValue.height}px`,
+                                transform: `translate(${translate?.x ?? 0}px,${
+                                    translate?.y ?? 0
+                                }px)`,
                             }}
                         >
                             <Frame className={`itemBg`} />

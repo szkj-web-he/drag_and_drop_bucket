@@ -1,10 +1,9 @@
 import "./style.scss";
 
 import { Warehouse } from "./warehouse";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { StorageCabinet } from "./storageCabinet";
 import { BasketUpFnProps, Context } from "./context";
-import { isMobile } from "./isMobile";
 import { PluginComms, ConfigYML } from "@possie-engine/dr-plugin-sdk";
 import Hr from "./hr";
 
@@ -23,8 +22,6 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const [mobileStatus, setMobileStatus] = useState(isMobile);
-
     const basketFn = useRef<{
         move: (x: number, y: number) => undefined;
         up: (res: BasketUpFnProps) => undefined;
@@ -36,23 +33,13 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
-    useEffect(() => {
-        const fn = () => {
-            setMobileStatus(isMobile);
-        };
-        window.addEventListener("resize", fn);
-        return () => {
-            window.removeEventListener("resize", fn);
-        };
-    }, []);
-
     /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
-        <div className={`wrapper${mobileStatus ? ` mobile` : ""}`}>
+        <div className={`wrapper`}>
             <div className="question">
                 <div
                     className="questionContent"
@@ -69,7 +56,6 @@ const Main: React.FC = () => {
             </div>
             <Context.Provider
                 value={{
-                    isMobile: mobileStatus,
                     basketFn,
                 }}
             >
