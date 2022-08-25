@@ -7,7 +7,6 @@ import { getScrollValue } from "./getScrollValue";
 import Frame from "./itemFrame";
 import { stopSelect } from "./noSelected";
 import { OptionProps } from "./unit";
-import { useEffect } from "react";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -42,10 +41,6 @@ export const Product: React.FC<ProductProps> = memo(
 
         const [translate, setTranslate] = useState<{ x: number; y: number }>();
         /* <------------------------------------ **** STATE END **** ------------------------------------ */
-
-        useEffect(() => {
-            console.log(JSON.stringify(translate));
-        }, [translate]);
 
         /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
         /************* This section will include this component general function *************/
@@ -182,7 +177,6 @@ export const Product: React.FC<ProductProps> = memo(
                 y: position.pageY,
             });
         };
-
         /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
         return (
             <>
@@ -245,7 +239,7 @@ export const Product: React.FC<ProductProps> = memo(
         );
     },
     (a, b) => {
-        return JSON.stringify(a) !== JSON.stringify(b);
+        return JSON.stringify(a) === JSON.stringify(b);
     },
 );
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

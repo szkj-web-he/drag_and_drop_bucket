@@ -255,8 +255,10 @@ export const ScrollComponent = forwardRef<HTMLDivElement, ScrollProps>(
             if (mobileStatus) {
                 return;
             }
-            setScrollBar(e.currentTarget);
-            setHover(true);
+            setHover(() => {
+                setScrollBar(e.currentTarget);
+                return true;
+            });
         };
 
         /**

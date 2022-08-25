@@ -186,6 +186,7 @@ body {
     @include Item();
     position: absolute;
     z-index: 50;
+    overflow: hidden;
     pointer-events: none;
 }
 

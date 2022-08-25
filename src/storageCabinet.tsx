@@ -14,6 +14,7 @@ import { Tablet } from "./ColorItems/tablet";
 import Frame from "./frame";
 import { OptionProps } from "./unit";
 import { isMobile } from "./isMobile";
+import { deepCloneData } from "./unit";
 
 export interface ListItemProps {
     code: string;
@@ -69,10 +70,10 @@ export const StorageCabinet: React.FC = () => {
 
         basketFn.current = {
             move: (x: number, y: number) => {
-                setActiveIndex((pre) => {
+                setActiveIndex(() => {
                     const n = findIndex(x, y);
                     indexRef.current = n ?? undefined;
-                    return n ?? pre;
+                    return n ?? undefined;
                 });
             },
             up: (res: BasketUpFnProps) => {
@@ -84,36 +85,55 @@ export const StorageCabinet: React.FC = () => {
                     return;
                 }
 
-                const arr: typeof listRef.current = [];
-                for (let i = 0; i < listRef.current.length; i++) {
-                    if (i !== res.index) {
-                        arr[i] = { ...listRef.current[i] };
-                    } else {
-                        arr[i] = {
-                            code: listRef.current[i].code,
-                            content: listRef.current[i].content,
-                            values: [],
-                        };
-                        for (let j = 0; j < listRef.current[i].values.length; ++j) {
-                            const item = listRef.current[i].values[j];
-                            if (item.code !== res.data.code) {
-                                arr[i].values.push({ ...item });
-                            }
+                const arr = deepCloneData(listRef.current);
+                let status = false;
+                if (typeof n === "number") {
+                    //是否已经存在
+                    for (let i = 0; i < arr[n].values.length; ) {
+                        const item = arr[n].values[i];
+                        if (item.code === res.data.code) {
+                            status = true;
+                            i = arr[n].values.length;
+                        } else {
+                            ++i;
                         }
                     }
                 }
-                if (
-                    typeof n === "number" &&
-                    !listRef.current[n].values.some((item) => item.code === res.data.code)
-                ) {
+                if (status && res.index === undefined) {
+                    return;
+                }
+
+                //这里 删除
+                for (let i = 0; i < arr.length; ) {
+                    if (i === res.index) {
+                        let index = -1;
+                        for (let j = 0; j < arr[i].values.length; ) {
+                            const item = arr[i].values[j];
+                            if (item.code === res.data.code) {
+                                index = j;
+                                j = arr[i].values.length;
+                            } else {
+                                ++j;
+                            }
+                        }
+                        if (index >= 0) {
+                            arr[i].values.splice(index, 1);
+                        }
+
+                        i = arr.length;
+                    } else {
+                        ++i;
+                    }
+                }
+                //这里添加
+                if (typeof n === "number" && !status) {
                     arr[n].values.push({
                         code: res.data.code,
                         content: res.data.content,
                     });
                 }
-
                 listRef.current = [...arr];
-                setList([...listRef.current]);
+                setList(deepCloneData([...listRef.current]));
             },
         };
         return () => {

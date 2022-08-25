@@ -1,11 +1,12 @@
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Product } from "./product";
 import { comms } from ".";
 import { ScrollComponent } from "./Scroll";
 import Frame from "./frame";
+import { deepCloneData } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 
@@ -16,7 +17,7 @@ import Frame from "./frame";
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
 export const Warehouse: React.FC = () => {
-    const params = comms.config.options?.[1] ?? [];
+    const params = useMemo(() => deepCloneData(comms.config.options?.[1] ?? []), []);
 
     return (
         <div className="warehouse_wrap">
