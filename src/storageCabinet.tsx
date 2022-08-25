@@ -29,9 +29,7 @@ export const StorageCabinet: React.FC = () => {
 
     const { basketFn } = useMContext();
 
-    const [is1024, setIs1024] = useState(window.matchMedia("(max-width: 1000px)").matches);
-
-    const [is375, setIs375] = useState(window.matchMedia("(max-width: 703px)").matches);
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
     const listRef = useRef<Array<ListItemProps>>(
         (comms.config.options?.[0] ?? []).map((item) => ({
@@ -45,7 +43,29 @@ export const StorageCabinet: React.FC = () => {
     const indexRef = useRef<number>();
     const [activeIndex, setActiveIndex] = useState(indexRef.current);
 
-    const [mobileStatus, setMobileStatus] = useState(isMobile());
+    const [contentEl, setContentEl] = useState(() => {
+        if (isMobile()) {
+            return window.matchMedia("(max-width: 703px)").matches ? (
+                <Mobile activeIndex={activeIndex} colors={list}>
+                    <Frame type="bottom" />
+                </Mobile>
+            ) : (
+                <Tablet activeIndex={activeIndex} colors={list}>
+                    <Frame type="bottom" />
+                </Tablet>
+            );
+        } else {
+            return window.matchMedia("(max-width: 1000px)").matches ? (
+                <SmallDesk activeIndex={activeIndex} colors={list}>
+                    <Frame type="bottom" />
+                </SmallDesk>
+            ) : (
+                <Desk activeIndex={activeIndex} colors={list}>
+                    <Frame type="bottom" />
+                </Desk>
+            );
+        }
+    });
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
@@ -143,15 +163,39 @@ export const StorageCabinet: React.FC = () => {
 
     useEffect(() => {
         const fn = () => {
-            setMobileStatus(isMobile());
-            setIs1024(window.matchMedia("(max-width: 1000px)").matches);
-            setIs375(window.matchMedia("(max-width: 703px)").matches);
+            setScreenWidth(window.innerWidth);
         };
         window.addEventListener("resize", fn);
         return () => {
             window.removeEventListener("resize", fn);
         };
     }, []);
+
+    useEffect(() => {
+        setContentEl(() => {
+            if (isMobile()) {
+                return window.matchMedia("(max-width: 703px)").matches ? (
+                    <Mobile activeIndex={activeIndex} colors={list}>
+                        <Frame type="bottom" />
+                    </Mobile>
+                ) : (
+                    <Tablet activeIndex={activeIndex} colors={list}>
+                        <Frame type="bottom" />
+                    </Tablet>
+                );
+            } else {
+                return window.matchMedia("(max-width: 1000px)").matches ? (
+                    <SmallDesk activeIndex={activeIndex} colors={list}>
+                        <Frame type="bottom" />
+                    </SmallDesk>
+                ) : (
+                    <Desk activeIndex={activeIndex} colors={list}>
+                        <Frame type="bottom" />
+                    </Desk>
+                );
+            }
+        });
+    }, [activeIndex, list, screenWidth]);
 
     useEffect(() => {
         const data: Record<string, Record<string, string>> = {};
@@ -182,33 +226,9 @@ export const StorageCabinet: React.FC = () => {
 
     let classStr = "storageCabinet_wrap";
 
-    let mainEl = <></>;
-
-    if (mobileStatus) {
-        mainEl = is375 ? (
-            <Mobile activeIndex={activeIndex} colors={list}>
-                <Frame type="bottom" />
-            </Mobile>
-        ) : (
-            <Tablet activeIndex={activeIndex} colors={list}>
-                <Frame type="bottom" />
-            </Tablet>
-        );
-    } else {
-        mainEl = is1024 ? (
-            <SmallDesk activeIndex={activeIndex} colors={list}>
-                <Frame type="bottom" />
-            </SmallDesk>
-        ) : (
-            <Desk activeIndex={activeIndex} colors={list}>
-                <Frame type="bottom" />
-            </Desk>
-        );
-    }
-
-    if (mobileStatus) {
-        classStr += is375 ? " mobile" : " tablet";
-    } else if (is1024) {
+    if (isMobile()) {
+        classStr += window.matchMedia("(max-width: 703px)").matches ? " mobile" : " tablet";
+    } else if (window.matchMedia("(max-width: 1000px)").matches) {
         classStr += " small_desk";
     } else {
         classStr += " desk";
@@ -220,7 +240,7 @@ export const StorageCabinet: React.FC = () => {
                 共<span>{list.length}</span>
                 个分类
             </div>
-            {mainEl}
+            {contentEl}
         </div>
     );
 };

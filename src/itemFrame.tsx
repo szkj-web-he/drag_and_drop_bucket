@@ -17,8 +17,6 @@ const Temp: React.FC<TempProps> = ({ style, className }) => {
     /************* This section will include this component HOOK function *************/
     const [el, setEl] = useState<HTMLCanvasElement | null>(null);
 
-    const timer = useRef<number>();
-
     const elRef = useRef(el);
 
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
@@ -27,21 +25,17 @@ const Temp: React.FC<TempProps> = ({ style, className }) => {
     useLayoutEffect(() => {
         elRef.current = el;
         if (el) {
-            timer.current && window.clearTimeout(timer.current);
-            timer.current = window.setTimeout(() => {
-                timer.current = undefined;
-
-                drawItemRoundRect(el);
-            });
+            drawItemRoundRect(el);
         }
     }, [el]);
 
     useEffect(() => {
+        let timer: null | number = null;
         const fn = () => {
-            timer.current && window.clearTimeout(timer.current);
-            timer.current = window.setTimeout(() => {
+            timer && window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
                 const node = elRef.current;
-                timer.current = undefined;
+                timer = null;
                 if (!node) {
                     return;
                 }
@@ -52,7 +46,7 @@ const Temp: React.FC<TempProps> = ({ style, className }) => {
         window.addEventListener("resize", fn);
         return () => {
             window.removeEventListener("resize", fn);
-            timer.current && window.clearTimeout(timer.current);
+            timer && window.clearTimeout(timer);
         };
     }, []);
 
