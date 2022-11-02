@@ -25,15 +25,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Build package
+        run: |
+          npm i
+          npm run build
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build package
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-        run: |
-            npm i
-            npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Build with Jekyll
