@@ -24,11 +24,11 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
 
-jobs:
-  # Build job
-  build:
-    runs-on: ubuntu-latest
-    steps:
+# jobs:
+#   # Build job
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
       # - name: Build
       #   run: yarn run build
   #     - name: Checkout
