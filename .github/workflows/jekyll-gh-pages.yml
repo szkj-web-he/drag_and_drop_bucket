@@ -25,12 +25,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Echo config
-        run: npm -v
-      # - name: Build package
-      #   run: |
-      #     npm i
-      #     npm run build
+      - name: Install
+        run: npm i
+      - name: Build
+        run: npm run build
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Pages
