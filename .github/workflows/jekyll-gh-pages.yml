@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Echo config
-        run: echo "npm -v"
+        run: echo npm -v
       - name: Build package
         run: |
           npm i
