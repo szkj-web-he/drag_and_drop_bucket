@@ -1,4 +1,4 @@
-import "./font";
+import "./font.scss";
 import "./style.scss";
 
 import { Warehouse } from "./warehouse";

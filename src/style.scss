@@ -19,7 +19,7 @@ $mobileSpan: calc(calc(100vw - 16px * 2 - 11 * 20px) / 12);
 html,
 .wrapper,
 body,
-body > div:not([class], [id]) {
+body > div:first-child {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
